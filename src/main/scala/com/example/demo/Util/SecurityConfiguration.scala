@@ -25,13 +25,14 @@ class SecurityConfiguration (jwtAuthenticationFilter: JwtAuthenticationFilter) {
     http
       .csrf(_.disable())
       .sessionManagement(session=>session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+      .cors(Customizer.withDefaults())
       .authorizeHttpRequests(auth => auth
         .requestMatchers("/api/auth/**").permitAll()
-        .requestMatchers("/api/asset/**").hasAnyRole("ADMIN","EMPLOYEE")
+        .requestMatchers("/api/asset/**").hasAnyRole("ADMIN","EMPLOYEE","TECH")
         .requestMatchers("/api/user/**"). hasAnyRole("ADMIN", "TECH", "EMPLOYEE")
         .requestMatchers("/api/complaint/**").hasAnyRole("ADMIN","TECH","EMPLOYEE")
         .requestMatchers("/api/asset-request/**").hasAnyRole("ADMIN","EMPLOYEE")
-        .requestMatchers("/api/asset-assignment/**").hasRole("EMPLOYEE")
+        .requestMatchers("/api/asset-assignment/**").hasAnyRole("EMPLOYEE","ADMIN")
         .anyRequest().authenticated()
       )
       .addFilterBefore(jwtAuthenticationFilter,classOf[UsernamePasswordAuthenticationFilter])

@@ -11,4 +11,9 @@ trait AssetAssignmentRepository extends JpaRepository[AssetAssignment, Long] {
 
   def findAllByUserIdAndReturnedAtIsNull(userId:Long):java.util.List[AssetAssignment]
   
+  def findAllByReturnedAtIsNull():java.util.List[AssetAssignment]
+  
+  def findAllByUserId(userId:Long):java.util.List[AssetAssignment]
+  
+  def findAllByReturnedAtIsNotNull():java.util.List[AssetAssignment]
 } 

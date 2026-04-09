@@ -58,9 +58,14 @@ class AssetController(assetService: AssetService) {
   }
   
   @GetMapping(value=Array("/count"))
-  @PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
   def getAllAssetCount:ResponseEntity[AssetCountDTO]  = {
     val  assetCountDTO:AssetCountDTO=assetService.getAllAssetCount
     new ResponseEntity[AssetCountDTO](assetCountDTO,HttpStatus.OK)
+  }
+
+  @GetMapping(value = Array("/{assetId}"))
+  def getAssetById(@PathVariable assetId: Long): ResponseEntity[AssetResponseDTO] = {
+    val asset: AssetResponseDTO = assetService.getAssetById(assetId)
+    new ResponseEntity[AssetResponseDTO](asset, HttpStatus.OK)
   }
 }

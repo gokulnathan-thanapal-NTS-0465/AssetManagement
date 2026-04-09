@@ -1,15 +1,16 @@
 package com.example.demo.Controller
 
-import com.example.demo.DTO.{ComplaintCreationDTO, ComplaintResponseDTO}
+import com.example.demo.DTO.{ComplaintCreationDTO, ComplaintResponseDTO, ComplaintStatsDTO}
 import com.example.demo.Model.Enums.ComplaintStatus
 import com.example.demo.Service.ComplaintService
 import org.springframework.http.{HttpStatus, ResponseEntity}
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.{GetMapping, PathVariable, PostMapping, RequestBody, RequestMapping, RequestParam, RestController}
+import org.springframework.web.bind.annotation.{CrossOrigin, GetMapping, PatchMapping, PathVariable, PostMapping, RequestBody, RequestMapping, RequestParam, RestController}
 
 
 @RestController
 @RequestMapping(value = Array("/api/complaint"))
+@CrossOrigin(origins = Array("*"))
 class ComplaintController(complaintService: ComplaintService) {
 
   @PostMapping(value = Array("/create"))
@@ -25,14 +26,15 @@ class ComplaintController(complaintService: ComplaintService) {
     val complaintResponseDTO: ComplaintResponseDTO = complaintService.createComplaintAdmin(complaintDTO)
     new ResponseEntity[ComplaintResponseDTO](complaintResponseDTO, HttpStatus.CREATED)
   }
-  @PostMapping(value = Array("/{complaintId}/process"))
+
+  @PatchMapping(value = Array("/{complaintId}/process"))
   @PreAuthorize("hasRole('TECH')")
   def processComplaint(@PathVariable complaintId: Long): ResponseEntity[String] = {
     complaintService.processComplaint(complaintId)
     new ResponseEntity[String]("Complaint process started for complaint ID: " + complaintId, HttpStatus.OK)
   }
 
-  @PostMapping(value = Array("/{complaintId}/resolve"))
+  @PatchMapping(value = Array("/{complaintId}/resolve"))
   @PreAuthorize("hasRole('TECH')")
   def resolveComplaint(@PathVariable complaintId: Long): ResponseEntity[String] = {
     complaintService.resolveComplaint(complaintId)
@@ -51,5 +53,21 @@ class ComplaintController(complaintService: ComplaintService) {
   def getAllComplaintsByUserId(@RequestParam userId: Long): ResponseEntity[List[ComplaintResponseDTO]] = {
     val complaints: List[ComplaintResponseDTO] = complaintService.getAllComplaintsByUserId(userId)
     new ResponseEntity[List[ComplaintResponseDTO]](complaints, HttpStatus.OK)
+  }
+
+  @GetMapping(value = Array("/{complaintId}"))
+  @PreAuthorize("hasRole('TECH') or ((hasRole('EMPLOYEE') or  hasRole('ADMIN')) and @authService.canAccessComplaint(#complaintId))")
+  def getComplaintById(@PathVariable complaintId: Long): ResponseEntity[ComplaintResponseDTO] = {
+    val complaint: ComplaintResponseDTO = complaintService.getComplaintById(complaintId)
+    println(complaint)
+    new ResponseEntity[ComplaintResponseDTO](complaint, HttpStatus.OK)
+  }
+
+  @GetMapping(value=Array("/stats"))
+  @PreAuthorize("hasRole('TECH') or hasRole('ADMIN')")
+  def getComplaintStats: ResponseEntity[ComplaintStatsDTO] = {
+    val complaintStatsDTO: ComplaintStatsDTO = complaintService.getComplaintStats
+    println(complaintStatsDTO.toString)
+    new ResponseEntity[ComplaintStatsDTO](complaintStatsDTO, HttpStatus.OK)
   }
 }

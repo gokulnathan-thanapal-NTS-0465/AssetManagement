@@ -15,7 +15,8 @@ class AuthService @Autowired()(
                                 passwordEncoder: PasswordEncoder,
                                 jwtUtil: JwtUtil,
                                 assetRequestService: AssetRequestService,
-                                assetAssignmentService: AssetAssignmentService
+                                assetAssignmentService: AssetAssignmentService,
+                                complaintService: ComplaintService
                               ) {
 
   def login(loginRequest: LoginRequestDTO): LoginResponseDTO = {
@@ -40,7 +41,6 @@ class AuthService @Autowired()(
           userType = user.userType,
           userId = user.id
         )
-
       } else {
         throw new SecurityException("Invalid credentials")
       }
@@ -73,6 +73,19 @@ class AuthService @Autowired()(
   def canAccessReturn(assignmentId:Long):Boolean={
     getCurrentUserId match{
       case Some(userId) =>assetAssignmentService.canAccessReturn(assignmentId , userId )
+      case None => false
+    }
+  }
+  
+  def canAccessComplaint(complaintId:Long):Boolean={
+    getCurrentUserId match{
+      case Some(userId) =>complaintService.canUserAccessComplaint(complaintId , userId )
+      case None => false
+    }
+  }
+  def canAccessAssignment(assignment:Long):Boolean={
+    getCurrentUserId match{
+      case Some(userId) => assetAssignmentService.canAccessAssetAssignment(assignment,userId)
       case None => false
     }
   }

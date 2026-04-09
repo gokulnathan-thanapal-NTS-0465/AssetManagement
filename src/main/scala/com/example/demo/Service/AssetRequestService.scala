@@ -7,6 +7,7 @@ import com.example.demo.Model.{Asset, AssetAssignment, AssetRequest, Credit, Use
 import com.example.demo.Model.Enums.{AssetStatus, Category, RequestStatus}
 import com.example.demo.Repo.{AssetAssignmentRepository, AssetRepository, AssetRequestRepository, UserRepository}
 import jakarta.persistence.EntityNotFoundException
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -88,6 +89,15 @@ class AssetRequestService(userRepo: UserRepository, assetRequestRepo: AssetReque
     assetRequest = assetRequestRepo.save(assetRequest)
   }
 
+  def withdrawRequest(requestId:Long):Unit={
+    val assetRequest: AssetRequest = assetRequestRepo.findById(requestId).orElseThrow(() => new EntityNotFoundException("Asset request not found"))
+    if (assetRequest.status != RequestStatus.PENDING) {
+      throw new IllegalStateException("Only pending requests can be withdrawn")
+    }
+    assetRequest.status = RequestStatus.CANCELLED
+    assetRequestRepo.save(assetRequest)
+  }
+  
   def getAllRequest(status: RequestStatus): List[AssetRequestResponseDTO] = {
 
     val assetRequests: List[AssetRequest] = {

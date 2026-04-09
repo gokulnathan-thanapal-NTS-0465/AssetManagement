@@ -24,4 +24,6 @@ object ComplaintMapper {
     responseDTO.status = complaint.status
     responseDTO
   }
+  
+  
 }

@@ -1,6 +1,6 @@
 package com.example.demo.Service
 
-import com.example.demo.DTO.{ComplaintCreationDTO, ComplaintResponseDTO}
+import com.example.demo.DTO.{ComplaintCreationDTO, ComplaintResponseDTO, ComplaintStatsDTO}
 import com.example.demo.Mapper.ComplaintMapper
 import com.example.demo.Model.Enums.{AssetStatus, ComplaintStatus}
 import com.example.demo.Model.{Asset, Complaint, User}
@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional
 import scala.jdk.CollectionConverters.*
 
 
-
 @Service
 class ComplaintService(userRepo: UserRepository, complaintRepo: ComplaintRepository, assetRepo: AssetRepository) {
 
@@ -20,41 +19,43 @@ class ComplaintService(userRepo: UserRepository, complaintRepo: ComplaintReposit
   @Transactional
   def createComplaint(complaintCreationDTO: ComplaintCreationDTO): ComplaintResponseDTO = {
 
-    val user: User = userRepo.findById(complaintCreationDTO.userId.getOrElse(
-      throw new IllegalArgumentException("User ID is required"))).orElseThrow(()=> EntityNotFoundException("User not found"))
+    val userId:String=complaintCreationDTO.userId.getOrElse(throw new IllegalArgumentException("User ID is required"))
 
-    val asset: Asset = assetRepo.findById(complaintCreationDTO.assetId.getOrElse(
-      throw new IllegalArgumentException("Asset ID is required"))).orElseThrow(()=> EntityNotFoundException("Asset not found"))
+    val user: User = userRepo.findById(userId.toLong).orElseThrow(() => EntityNotFoundException("User not found"))
+
+    val assetId:String=complaintCreationDTO.assetId.getOrElse(throw new IllegalArgumentException("Asset ID is required"))
+    val asset: Asset = assetRepo.findById(assetId.toLong).orElseThrow(() => EntityNotFoundException("Asset not found"))
 
     if (!isAssetBelongsToUser(user, asset)) {
       throw new SecurityException("Asset does not belong to the user")
     }
-      
+
     else if (asset.status != AssetStatus.ASSIGNED) {
       throw new IllegalStateException("Asset is not currently assigned , cannot file complaint ")
     }
 
     var newComplaint: Complaint = ComplaintMapper.toEntity(complaintCreationDTO, user, asset)
     newComplaint = complaintRepo.save(newComplaint)
-    
+
     val complaintResponseDTO: ComplaintResponseDTO = ComplaintMapper.toComplaintResponseDTO(newComplaint)
     complaintResponseDTO
   }
-  def createComplaintAdmin(complaintCreationDTO: ComplaintCreationDTO):ComplaintResponseDTO={
-    
-    val asset: Asset = assetRepo.findById(complaintCreationDTO.assetId.getOrElse(
-      throw new IllegalArgumentException("Asset ID is required"))).orElseThrow(()=> EntityNotFoundException("Asset not found"))
-    
-    val user: User = userRepo.findById(complaintCreationDTO.userId.getOrElse(
-      throw new IllegalArgumentException("User not found"))).orElseThrow(()=> EntityNotFoundException("User not found"))
 
-    if(asset.status!=AssetStatus.AVAILABLE){
-      throw new IllegalStateException("Asset is not available for complaint")
+  def createComplaintAdmin(complaintCreationDTO: ComplaintCreationDTO): ComplaintResponseDTO = {
+
+    val assetId:String=complaintCreationDTO.assetId.getOrElse(throw new IllegalArgumentException("Asset ID is required"))
+    val asset: Asset = assetRepo.findById(assetId.toLong).orElseThrow(() => EntityNotFoundException("Asset not found"))
+
+    val userId:String=complaintCreationDTO.userId.getOrElse(throw new IllegalArgumentException("User ID is required"))
+    val user: User = userRepo.findById(userId.toLong).orElseThrow(() => EntityNotFoundException("User not found"))
+
+    if (asset.status != AssetStatus.AVAILABLE) {
+      throw new IllegalStateException("Admin cannot file complaint for an asset that is not available")
     }
-    var newComplaint: Complaint = ComplaintMapper.toEntity(complaintCreationDTO,user, asset)
-    newComplaint=complaintRepo.save(newComplaint)
-    
-    val complaintResponseDTO:ComplaintResponseDTO=ComplaintMapper.toComplaintResponseDTO(newComplaint)
+    var newComplaint: Complaint = ComplaintMapper.toEntity(complaintCreationDTO, user, asset)
+    newComplaint = complaintRepo.save(newComplaint)
+
+    val complaintResponseDTO: ComplaintResponseDTO = ComplaintMapper.toComplaintResponseDTO(newComplaint)
     complaintResponseDTO
   }
 
@@ -80,7 +81,7 @@ class ComplaintService(userRepo: UserRepository, complaintRepo: ComplaintReposit
   @Transactional
   def resolveComplaint(complaintId: Long): ComplaintResponseDTO = {
 
-    val complaint: Complaint = complaintRepo.findById(complaintId).orElseThrow(()=> EntityNotFoundException("Complaint not found"))
+    val complaint: Complaint = complaintRepo.findById(complaintId).orElseThrow(() => EntityNotFoundException("Complaint not found"))
     if (complaint.status != ComplaintStatus.IN_PROGRESS) {
       throw new IllegalStateException("Only complaints in progress can be resolved ")
     }
@@ -96,7 +97,7 @@ class ComplaintService(userRepo: UserRepository, complaintRepo: ComplaintReposit
   }
 
 
-  def getAllComplaints(status:ComplaintStatus): List[ComplaintResponseDTO] = {
+  def getAllComplaints(status: ComplaintStatus): List[ComplaintResponseDTO] = {
 
     val complaints: List[Complaint] = {
       if (status != null) {
@@ -111,7 +112,15 @@ class ComplaintService(userRepo: UserRepository, complaintRepo: ComplaintReposit
 
   }
 
-  
+  def getComplaintStats: ComplaintStatsDTO = {
+    val complaintStatsDTO: ComplaintStatsDTO =new ComplaintStatsDTO
+    complaintStatsDTO.open=complaintRepo.countByStatus(ComplaintStatus.OPEN)
+    complaintStatsDTO.inProgress=complaintRepo.countByStatus(ComplaintStatus.IN_PROGRESS)
+    complaintStatsDTO.resolved=complaintRepo.countByStatus(ComplaintStatus.RESOLVED)
+    complaintStatsDTO.totalComplaints=complaintRepo.count()
+    complaintStatsDTO
+  }
+
   def getAllComplaintsByUserId(userId: Long): List[ComplaintResponseDTO] = {
 
     val complaints: List[Complaint] = complaintRepo.findByUserId(userId).asScala.toList
@@ -125,5 +134,17 @@ class ComplaintService(userRepo: UserRepository, complaintRepo: ComplaintReposit
     assetRepo.findAssetByUserId(user.id)
       .stream().anyMatch(a => a.id == asset.id)
 
+  }
+
+  def getComplaintById(complaintId: Long): ComplaintResponseDTO = {
+    val complaint: Complaint = complaintRepo.findById(complaintId).orElseThrow(() => new EntityNotFoundException("Complaint not found"))
+    val complaintResponseDTO: ComplaintResponseDTO = ComplaintMapper.toComplaintResponseDTO(complaint)
+    complaintResponseDTO
+  }
+
+  def canUserAccessComplaint(complaintId: Long, userId: Long): Boolean = {
+    val complaint: Complaint = complaintRepo.findById(complaintId).orElseThrow(() => new EntityNotFoundException("Complaint not found"))
+    println(complaint.user.id == userId)
+    complaint.user.id == userId
   }
 }

@@ -41,8 +41,8 @@ class AssetService(assetRepo: AssetRepository, assetAssignmentRepo: AssetAssignm
     else if (assetStatusDTO.status.get== AssetStatus.ASSIGNED) {
       throw new IllegalStateException("Asset cannot be directly assigned to a user !")
     }
-    else if (assetStatusDTO.status.get == AssetStatus.AVAILABLE && asset.status == AssetStatus.RETIRED) {
-      throw new IllegalStateException("Retired asset cannot be made available !")
+    else if(asset.status==AssetStatus.RETIRED){
+      throw new IllegalStateException("Retired asset cannot be updated as "+ assetStatusDTO.status.get )
     }
     else if (asset.status != AssetStatus.AVAILABLE) {
       val assetAssignment: AssetAssignment = assetAssignmentRepo.findByAssetIdAndReturnedAtIsNull(assetId)
@@ -149,5 +149,10 @@ class AssetService(assetRepo: AssetRepository, assetAssignmentRepo: AssetAssignm
     assetCountDTO
   }
 
+  def getAssetById(assetId: Long): AssetResponseDTO = {
+    val asset: Asset = assetRepo.findById(assetId).orElseThrow(() => new EntityNotFoundException("Asset not found "))
+    val assetResponseDTO: AssetResponseDTO = AssetMapper.toResponse(asset)
+    assetResponseDTO
+  }
 
 }

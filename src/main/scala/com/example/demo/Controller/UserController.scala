@@ -4,7 +4,7 @@ import com.example.demo.DTO.{UserCreateDTO, UserCredentialDTO, UserDepartmentDTO
 import com.example.demo.Model.Enums.UserType
 import org.springframework.http.{HttpStatus, ResponseEntity}
 import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.{DeleteMapping, GetMapping, PatchMapping, PathVariable, PostMapping, RequestBody, RequestMapping, RequestParam, RestController}
+import org.springframework.web.bind.annotation.{CrossOrigin, DeleteMapping, GetMapping, PatchMapping, PathVariable, PostMapping, RequestBody, RequestMapping, RequestParam, RestController}
 import com.example.demo.Model.User
 import com.example.demo.Service.UserService
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,19 +13,18 @@ import org.springframework.security.access.prepost.PreAuthorize
 
 @RestController
 @RequestMapping(value = Array("/api/user"))
+@CrossOrigin(origins = Array("*"))
 class UserController @Autowired(userService: UserService) {
 
-
-
   @PreAuthorize("hasRole('ADMIN')")
-  @PostMapping(value = Array("/signup"))
+  @PostMapping(value = Array("/create"))
   def createUser(@RequestBody user: UserCreateDTO): ResponseEntity[UserResponseDTO] = {
     val newUser: UserResponseDTO = userService.createUser(user)
     new ResponseEntity[UserResponseDTO](newUser, HttpStatus.CREATED)
   }
 
   @GetMapping(value = Array("/{userId}"))
-  @PreAuthorize("hasRole('ADMIN') or (hasRole('EMPLOYEE') and @authService.isCurrentUser(#userId))")
+  @PreAuthorize("hasRole('ADMIN') or hasRole('TECH') or (hasRole('EMPLOYEE') and @authService.isCurrentUser(#userId))")
   def getUserById(@PathVariable userId: Long): ResponseEntity[UserResponseDTO] = {
     val user: UserResponseDTO = userService.getUserById(userId)
     new ResponseEntity[UserResponseDTO](user, HttpStatus.OK)

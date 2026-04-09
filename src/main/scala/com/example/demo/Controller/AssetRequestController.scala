@@ -6,11 +6,12 @@ import com.example.demo.Model.Enums.RequestStatus
 import com.example.demo.Service.AssetRequestService
 import org.springframework.http.{HttpStatus, ResponseEntity}
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.{GetMapping, PathVariable, PostMapping, RequestBody, RequestMapping, RequestParam, ResponseBody, RestController}
+import org.springframework.web.bind.annotation.{CrossOrigin, GetMapping, PatchMapping, PathVariable, PostMapping, RequestBody, RequestMapping, RequestParam, ResponseBody, RestController}
 
 
 @RestController
 @RequestMapping(value = Array("/api/asset-request"))
+@CrossOrigin(origins = Array("*"))
 class AssetRequestController(assetRequestService: AssetRequestService) {
 
   @PostMapping(value = Array("/create"))
@@ -20,14 +21,14 @@ class AssetRequestController(assetRequestService: AssetRequestService) {
     new ResponseEntity[AssetRequestResponseDTO](newRequest, HttpStatus.CREATED)
   }
 
-  @PostMapping(value = Array("/accept/{requestId}"))
+  @PatchMapping(value = Array("/accept/{requestId}"))
   @PreAuthorize("hasRole('ADMIN')")
   def acceptAssetRequest(@PathVariable requestId: Long): ResponseEntity[AssetAssignmentDTO] = {
     val assignment: AssetAssignmentDTO = assetRequestService.acceptRequest(requestId)
     new ResponseEntity[AssetAssignmentDTO](assignment, HttpStatus.OK)
   }
 
-  @PostMapping(value = Array("/decline/{requestId}"))
+  @PatchMapping(value = Array("/decline/{requestId}"))
   @PreAuthorize("hasRole('ADMIN')")
   def declineAssetRequest(@PathVariable requestId: Long): ResponseEntity[String] = {
     assetRequestService.declineRequest(requestId)
@@ -55,4 +56,10 @@ class AssetRequestController(assetRequestService: AssetRequestService) {
     new ResponseEntity[List[AssetRequestResponseDTO]](requests, HttpStatus.OK)
   }
 
+  @PatchMapping(value = Array("/withdraw/{requestId}"))
+  @PreAuthorize("hasRole('EMPLOYEE') and @authService.canAccessRequest(#requestId)")
+  def withdrawRequest(@PathVariable requestId:Long) :ResponseEntity[String]={
+    assetRequestService.withdrawRequest(requestId)
+    new ResponseEntity[String]("Request Withdrawn Successfully", HttpStatus.OK)
+  }
 }
