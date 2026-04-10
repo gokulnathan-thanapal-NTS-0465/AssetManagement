@@ -63,6 +63,8 @@ class ComplaintService(userRepo: UserRepository, complaintRepo: ComplaintReposit
   def processComplaint(complaintId: Long): ComplaintResponseDTO = {
 
     val complaint: Complaint = complaintRepo.findById(complaintId).orElseThrow()
+    
+    val numberOfComplaintsInProgressForAsset: Long = complaintRepo.countByAssetIdAndStatus(complaint.asset.id, ComplaintStatus.IN_PROGRESS)
 
     if (complaint.status != ComplaintStatus.OPEN) {
       throw new IllegalStateException("Only open complaints can be processed")
@@ -70,10 +72,14 @@ class ComplaintService(userRepo: UserRepository, complaintRepo: ComplaintReposit
     complaint.status = ComplaintStatus.IN_PROGRESS
     val updatedComplaint = complaintRepo.save(complaint)
 
-    var asset: Asset = updatedComplaint.asset
-    asset.status = AssetStatus.MAINTENANCE
-    asset = assetRepo.save(asset)
+   
+    if(numberOfComplaintsInProgressForAsset==1){
+      var asset: Asset = updatedComplaint.asset
+      asset.status = AssetStatus.MAINTENANCE
+      asset = assetRepo.save(asset)
 
+    }
+   
     val complaintResponseDTO: ComplaintResponseDTO = ComplaintMapper.toComplaintResponseDTO(updatedComplaint)
     complaintResponseDTO
   }

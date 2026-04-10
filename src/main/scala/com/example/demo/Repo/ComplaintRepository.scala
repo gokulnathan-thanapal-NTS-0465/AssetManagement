@@ -10,6 +10,8 @@ trait ComplaintRepository extends JpaRepository[Complaint, Long] {
   def findByStatus(status: ComplaintStatus): java.util.List[Complaint]
 
   def countByStatus(status: ComplaintStatus): Long
-  
-  def findByUserId(userId:Long):java.util.List[Complaint]
+
+  def findByUserId(userId: Long): java.util.List[Complaint]
+
+  def countByAssetIdAndStatus(assetId: Long, status: ComplaintStatus): Long
 }
