@@ -19,7 +19,7 @@ object AssetMapper {
 
 
   def updateEntity(dto: AssetUpdateDTO, asset: Asset): Asset = {
-    asset.modelName = dto.modelName.get
+    asset.modelName = dto.modelName.getOrElse(throw  new IllegalArgumentException("Model name required"))
     asset
   }
 

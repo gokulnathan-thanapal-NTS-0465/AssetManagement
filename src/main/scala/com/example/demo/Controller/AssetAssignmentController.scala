@@ -16,9 +16,9 @@ class AssetAssignmentController(assetAssignmentService: AssetAssignmentService) 
 
   @PostMapping(value = Array("/return/{assignmentId}"))
   @PreAuthorize("hasRole('EMPLOYEE') and @authService.canAccessAssignment(#assignmentId)")
-  def returnAsset(@PathVariable assignmentId: Long): ResponseEntity[String] = {
-    val assetAssignment: AssetAssignment = assetAssignmentService.returnAsset(assignmentId)
-    new ResponseEntity[String](s"Asset with id ${assetAssignment.asset.id} returned successfully", HttpStatus.OK)
+  def returnAsset(@PathVariable assignmentId: Long): ResponseEntity[AssetAssignmentResponseDTO] = {
+    val assetAssignment: AssetAssignmentResponseDTO = assetAssignmentService.returnAsset(assignmentId)
+    new ResponseEntity[AssetAssignmentResponseDTO](assetAssignment, HttpStatus.OK)
   }
 
   @GetMapping(value = Array("/{assignmentId}"))

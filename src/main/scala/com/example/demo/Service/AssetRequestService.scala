@@ -89,6 +89,7 @@ class AssetRequestService(userRepo: UserRepository, assetRequestRepo: AssetReque
     assetRequest = assetRequestRepo.save(assetRequest)
   }
 
+  @Transactional
   def withdrawRequest(requestId:Long):Unit={
     val assetRequest: AssetRequest = assetRequestRepo.findById(requestId).orElseThrow(() => new EntityNotFoundException("Asset request not found"))
     if (assetRequest.status != RequestStatus.PENDING) {

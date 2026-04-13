@@ -30,7 +30,7 @@ class AuthService @Autowired()(
         throw new IllegalStateException("User account is deactivated")
       }
       else if(loginRequest.password.isEmpty){
-        throw new IllegalArgumentException("Password is required")
+        throw new IllegalArgumentException("Password required")
       }
 
       if (passwordEncoder.matches(loginRequest.password.get, user.passwordHash)) {

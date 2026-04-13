@@ -27,7 +27,7 @@ class UserService @Autowired(userRepo: UserRepository, passwordEncoder: Password
     }
     var user = UserMapper.toEntity(dto)
     val generatedUserId: String = generateUserId(user.userType)
-    val passwordEncoded = passwordEncoder.encode(dto.passwordHash.getOrElse(throw new IllegalArgumentException("Password is required")))
+    val passwordEncoded = passwordEncoder.encode(dto.passwordHash.getOrElse(throw new IllegalArgumentException("Password required")))
     user.employeeId = generatedUserId
     user.passwordHash = passwordEncoded
     user = userRepo.save(user)
@@ -100,6 +100,9 @@ class UserService @Autowired(userRepo: UserRepository, passwordEncoder: Password
       }
       existingUser.username = dto.username.get
     }
+    else if(dto.username.isDefined && dto.username.get==existingUser.username){
+      throw new IllegalArgumentException("New username cannot be the same as the current username")
+    }
     existingUser = userRepo.save(existingUser)
     UserMapper.toResponseDTO(existingUser)
   }
@@ -112,6 +115,9 @@ class UserService @Autowired(userRepo: UserRepository, passwordEncoder: Password
     }
     if(dto.department.isDefined && dto.department.get!=null&&dto.department.get!=existingUser.department){
       existingUser.department=dto.department.get
+    }
+    else if(dto.department.isDefined && dto.department.get==existingUser.department){
+      throw new IllegalArgumentException("New department cannot be the same as the current department")
     }
     existingUser=userRepo.save(existingUser)
     UserMapper.toResponseDTO(existingUser)

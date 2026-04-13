@@ -62,7 +62,7 @@ class ComplaintService(userRepo: UserRepository, complaintRepo: ComplaintReposit
   @Transactional
   def processComplaint(complaintId: Long): ComplaintResponseDTO = {
 
-    val complaint: Complaint = complaintRepo.findById(complaintId).orElseThrow()
+    val complaint: Complaint = complaintRepo.findById(complaintId).orElseThrow( () => throw new EntityNotFoundException("Complaint not found"))
     
     val numberOfComplaintsInProgressForAsset: Long = complaintRepo.countByAssetIdAndStatus(complaint.asset.id, ComplaintStatus.IN_PROGRESS)
 
@@ -128,8 +128,8 @@ class ComplaintService(userRepo: UserRepository, complaintRepo: ComplaintReposit
   }
 
   def getAllComplaintsByUserId(userId: Long): List[ComplaintResponseDTO] = {
-
-    val complaints: List[Complaint] = complaintRepo.findByUserId(userId).asScala.toList
+    val user :User = userRepo.findById(userId).orElseThrow(() => new EntityNotFoundException("User not found"))
+    val complaints:List[Complaint] = complaintRepo.findByUser(user).asScala.toList
     val complaintResponseDTOs: List[ComplaintResponseDTO] = complaints.map(complaint => ComplaintMapper.toComplaintResponseDTO(complaint))
     complaintResponseDTOs
 
@@ -150,7 +150,6 @@ class ComplaintService(userRepo: UserRepository, complaintRepo: ComplaintReposit
 
   def canUserAccessComplaint(complaintId: Long, userId: Long): Boolean = {
     val complaint: Complaint = complaintRepo.findById(complaintId).orElseThrow(() => new EntityNotFoundException("Complaint not found"))
-    println(complaint.user.id == userId)
     complaint.user.id == userId
   }
 }

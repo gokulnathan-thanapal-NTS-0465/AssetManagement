@@ -3,27 +3,26 @@ package com.example.demo.Service
 import com.example.demo.DTO.AssetAssignmentResponseDTO
 import com.example.demo.Mapper.AssetAssignmentMapper
 import com.example.demo.Model.Enums.AssetStatus
-import com.example.demo.Model.{Asset, AssetAssignment}
-import com.example.demo.Repo.{AssetAssignmentRepository, AssetRepository}
+import com.example.demo.Model.{Asset, AssetAssignment, User}
+import com.example.demo.Repo.{AssetAssignmentRepository, AssetRepository, UserRepository}
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import scala.jdk.CollectionConverters.*
 
+import scala.jdk.CollectionConverters.*
 import java.time.LocalDateTime
 
 
 @Service
-class AssetAssignmentService(assetAssignmentRepo: AssetAssignmentRepository, assetRepo: AssetRepository) {
+class AssetAssignmentService(assetAssignmentRepo: AssetAssignmentRepository, assetRepo: AssetRepository , userRepo: UserRepository) {
 
   @Transactional
-  def returnAsset(assignmentId: Long): AssetAssignment = {
+  def returnAsset(assignmentId: Long): AssetAssignmentResponseDTO = {
 
     var assetAssignment: AssetAssignment = assetAssignmentRepo.findById(assignmentId).orElseThrow(()=> new EntityNotFoundException("Asset assignment not found"))
     if (assetAssignment.returnedAt != null) {
       throw new IllegalStateException(s"Asset with id ${assetAssignment.asset.id} has already been returned")
     }
-    println("Returning asset with id: " + assetAssignment.asset.id)
     assetAssignment.returnedAt = LocalDateTime.now()
     var asset: Asset = assetAssignment.asset
     if(asset.status!=AssetStatus.MAINTENANCE){
@@ -33,7 +32,8 @@ class AssetAssignmentService(assetAssignmentRepo: AssetAssignmentRepository, ass
     asset = assetRepo.save(asset)
 
     assetAssignment = assetAssignmentRepo.save(assetAssignment)
-    assetAssignment
+    val assetAssignmentResponseDTO=AssetAssignmentMapper.toAssetAssignmentResponseDTO(assetAssignment)
+    assetAssignmentResponseDTO
   }
 
   def canAccessReturn(assignmentId:Long,userId:Long):Boolean={
@@ -63,7 +63,9 @@ class AssetAssignmentService(assetAssignmentRepo: AssetAssignmentRepository, ass
   }
 
   def getAssignmentsByUserId(userId:Long): List[AssetAssignmentResponseDTO] = {
-    val assetAssignments: List[AssetAssignment] = assetAssignmentRepo.findAllByUserId(userId).asScala.toList
+    val user:User=userRepo.findById(userId).orElseThrow(() => new EntityNotFoundException("User not found"))
+
+    val assetAssignments:List[AssetAssignment]=assetAssignmentRepo.findByUser(user).asScala.toList
     assetAssignments.map(assignment => AssetAssignmentMapper.toAssetAssignmentResponseDTO(assignment))
   }
 

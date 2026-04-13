@@ -1,6 +1,6 @@
 package com.example.demo.Repo
 
-import com.example.demo.Model.{Asset, AssetAssignment}
+import com.example.demo.Model.{Asset, AssetAssignment, User}
 import org.springframework.data.jpa.repository.{JpaRepository, Query}
 
 
@@ -16,4 +16,6 @@ trait AssetAssignmentRepository extends JpaRepository[AssetAssignment, Long] {
   def findAllByUserId(userId:Long):java.util.List[AssetAssignment]
   
   def findAllByReturnedAtIsNotNull():java.util.List[AssetAssignment]
+  
+  def findByUser(user:User):java.util.List[AssetAssignment]
 } 

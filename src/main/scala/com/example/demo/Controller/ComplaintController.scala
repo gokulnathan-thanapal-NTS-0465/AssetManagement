@@ -59,7 +59,6 @@ class ComplaintController(complaintService: ComplaintService) {
   @PreAuthorize("hasRole('TECH') or ((hasRole('EMPLOYEE') or  hasRole('ADMIN')) and @authService.canAccessComplaint(#complaintId))")
   def getComplaintById(@PathVariable complaintId: Long): ResponseEntity[ComplaintResponseDTO] = {
     val complaint: ComplaintResponseDTO = complaintService.getComplaintById(complaintId)
-    println(complaint)
     new ResponseEntity[ComplaintResponseDTO](complaint, HttpStatus.OK)
   }
 
@@ -67,7 +66,6 @@ class ComplaintController(complaintService: ComplaintService) {
   @PreAuthorize("hasRole('TECH') or hasRole('ADMIN')")
   def getComplaintStats: ResponseEntity[ComplaintStatsDTO] = {
     val complaintStatsDTO: ComplaintStatsDTO = complaintService.getComplaintStats
-    println(complaintStatsDTO.toString)
     new ResponseEntity[ComplaintStatsDTO](complaintStatsDTO, HttpStatus.OK)
   }
 }
