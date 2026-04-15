@@ -5,12 +5,14 @@ import com.example.demo.Model.AssetAssignment
 import com.example.demo.Service.AssetAssignmentService
 import org.springframework.http.{HttpStatus, ResponseEntity}
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.{CrossOrigin, GetMapping, PathVariable, PostMapping, RequestBody, RequestMapping, RequestParam, RestController}
 
 
 @RestController
 @RequestMapping(value = Array("/api/asset-assignment"))
 @CrossOrigin(origins = Array("*"))
+@Validated
 class AssetAssignmentController(assetAssignmentService: AssetAssignmentService) {
 
 

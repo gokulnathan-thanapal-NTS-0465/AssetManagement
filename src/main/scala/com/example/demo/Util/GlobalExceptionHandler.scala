@@ -4,10 +4,11 @@ import jakarta.persistence.EntityNotFoundException
 import org.springframework.dao.{DataAccessException, DataIntegrityViolationException}
 import org.springframework.http.{HttpStatus, ResponseEntity}
 import org.springframework.security.access.AccessDeniedException
+import org.springframework.validation.FieldError
 import org.springframework.web.bind.annotation.{ControllerAdvice, ExceptionHandler}
-import org.springframework.web.bind.MissingServletRequestParameterException
+import org.springframework.web.bind.{MethodArgumentNotValidException, MissingServletRequestParameterException}
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
-
+import scala.jdk.CollectionConverters.*
 import java.time.LocalDateTime
 
 class ErrorResponse {
@@ -146,5 +147,28 @@ class GlobalExceptionHandler {
       "An unexpected error occurred"
     )
     new ResponseEntity[ErrorResponse](errorResponse, HttpStatus.INTERNAL_SERVER_ERROR)
+  }
+
+
+  @ExceptionHandler(Array(classOf[MethodArgumentNotValidException]))
+  def handleValidationExceptions(ex: MethodArgumentNotValidException): ResponseEntity[Map[String, Any]] = {
+    val errors: Map[String, String] = ex.getBindingResult
+      .getAllErrors
+      .asScala
+      .map { error =>
+        val fieldName = error match {
+          case fieldError: FieldError => fieldError.getField
+          case _ => error.getObjectName
+        }
+        fieldName -> error.getDefaultMessage
+      }
+      .toMap
+
+    val response = Map(
+      "status" -> "error",
+      "message" -> "Validation failed",
+      "errors" -> errors
+    )
+    new ResponseEntity[Map[String, Any]](response, HttpStatus.BAD_REQUEST)
   }
 }

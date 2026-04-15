@@ -1,31 +1,34 @@
 package com.example.demo.Controller
 
-import com.example.demo.DTO.{AssetAssignmentDTO, AssetRequestDTO, AssetRequestResponseDTO}
+import com.example.demo.DTO.{AssetAssignmentDTO, AssetAssignmentResponseDTO, AssetRequestDTO, AssetRequestResponseDTO}
 import com.example.demo.Model.AssetRequest
 import com.example.demo.Model.Enums.RequestStatus
 import com.example.demo.Service.AssetRequestService
+import jakarta.validation.Valid
 import org.springframework.http.{HttpStatus, ResponseEntity}
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.{CrossOrigin, GetMapping, PatchMapping, PathVariable, PostMapping, RequestBody, RequestMapping, RequestParam, ResponseBody, RestController}
 
 
 @RestController
 @RequestMapping(value = Array("/api/asset-request"))
 @CrossOrigin(origins = Array("*"))
+@Validated
 class AssetRequestController(assetRequestService: AssetRequestService) {
 
   @PostMapping(value = Array("/create"))
   @PreAuthorize("hasRole('EMPLOYEE')")
-  def createRequest(@RequestBody request: AssetRequestDTO): ResponseEntity[AssetRequestResponseDTO] = {
+  def createRequest(@Valid @RequestBody request: AssetRequestDTO): ResponseEntity[AssetRequestResponseDTO] = {
     val newRequest: AssetRequestResponseDTO = assetRequestService.createRequest(request)
     new ResponseEntity[AssetRequestResponseDTO](newRequest, HttpStatus.CREATED)
   }
 
   @PatchMapping(value = Array("/accept/{requestId}"))
   @PreAuthorize("hasRole('ADMIN')")
-  def acceptAssetRequest(@PathVariable requestId: Long): ResponseEntity[AssetAssignmentDTO] = {
-    val assignment: AssetAssignmentDTO = assetRequestService.acceptRequest(requestId)
-    new ResponseEntity[AssetAssignmentDTO](assignment, HttpStatus.OK)
+  def acceptAssetRequest(@PathVariable requestId: Long): ResponseEntity[AssetAssignmentResponseDTO] = {
+    val assignment: AssetAssignmentResponseDTO = assetRequestService.acceptRequest(requestId)
+    new ResponseEntity[AssetAssignmentResponseDTO](assignment, HttpStatus.OK)
   }
 
   @PatchMapping(value = Array("/decline/{requestId}"))

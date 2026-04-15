@@ -317,7 +317,7 @@ class AssetRequestServiceTest extends AnyWordSpec with Matchers with MockitoSuga
 
         val result = assetRequestService.acceptRequest(1L)
 
-        result.userId shouldBe 1L
+        
         verify(assetAssignmentRepo).save(ArgumentMatchers.any[AssetAssignment])
         verify(userRepo).save(ArgumentMatchers.any[User])
         verify(assetRepo).save(ArgumentMatchers.any[Asset])

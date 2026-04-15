@@ -20,7 +20,10 @@ class AuthService @Autowired()(
                               ) {
 
   def login(loginRequest: LoginRequestDTO): LoginResponseDTO = {
-    val userOptional = userRepository.findByUsername(loginRequest.username.getOrElse(throw new IllegalArgumentException("Username is required")))
+    if(loginRequest.username==null || loginRequest.username.isEmpty){
+      throw new IllegalArgumentException("Username is required")
+    }
+    val userOptional = userRepository.findByUsername(loginRequest.username)
     
     
     if (userOptional.isPresent) {
@@ -33,7 +36,7 @@ class AuthService @Autowired()(
         throw new IllegalArgumentException("Password required")
       }
 
-      if (passwordEncoder.matches(loginRequest.password.get, user.passwordHash)) {
+      if (passwordEncoder.matches(loginRequest.password, user.passwordHash)) {
         val token = jwtUtil.generateToken(user.username, user.userType, user.id)
         LoginResponseDTO(
           token = token,

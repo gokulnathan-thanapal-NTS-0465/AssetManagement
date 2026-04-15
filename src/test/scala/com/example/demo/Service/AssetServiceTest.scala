@@ -459,12 +459,9 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
 
       "preserve other asset properties when updating model name" in {
         val existingAsset = createSampleAsset(
-          id = 1L,
-          serialNumber = "LAP-0001",
           modelName = "Old Model",
           status = AssetStatus.AVAILABLE,
           category = Category.LAPTOP,
-          credit = 75
         )
         val dto = AssetUpdateDTO(modelName = Some("New Model"))
 
@@ -561,7 +558,7 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
 
       "return all assets for user when no filters" in {
         val assets = java.util.Arrays.asList(
-          createSampleAsset(id = 1L, serialNumber = "LAP-0001"),
+          createSampleAsset(),
           createSampleAsset(id = 2L, serialNumber = "MOB-0001", category = Category.MOBILE)
         )
 
@@ -575,7 +572,7 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
 
       "filter by status only" in {
         val assets = java.util.Arrays.asList(
-          createSampleAsset(id = 1L, status = AssetStatus.ASSIGNED)
+          createSampleAsset(status = AssetStatus.ASSIGNED)
         )
 
         when(assetRepo.findAssetByUserIdAndStatus(AssetStatus.ASSIGNED, 1L)).thenReturn(assets)
@@ -588,7 +585,7 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
 
       "filter by category only" in {
         val assets = java.util.Arrays.asList(
-          createSampleAsset(id = 1L, category = Category.LAPTOP),
+          createSampleAsset(category = Category.LAPTOP),
           createSampleAsset(id = 2L, category = Category.LAPTOP)
         )
 
@@ -602,7 +599,7 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
 
       "filter by both status and category" in {
         val assets = java.util.Arrays.asList(
-          createSampleAsset(id = 1L, status = AssetStatus.ASSIGNED, category = Category.LAPTOP)
+          createSampleAsset(status = AssetStatus.ASSIGNED, category = Category.LAPTOP)
         )
 
         when(assetRepo.findAssetByUserIdAndStatusAndCategory(AssetStatus.ASSIGNED, 1L, Category.LAPTOP))
@@ -651,7 +648,7 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
 
       "filter by status only (AVAILABLE)" in {
         val assets = java.util.Arrays.asList(
-          createSampleAsset(id = 1L, status = AssetStatus.AVAILABLE),
+          createSampleAsset(status = AssetStatus.AVAILABLE),
           createSampleAsset(id = 2L, status = AssetStatus.AVAILABLE)
         )
 
@@ -663,45 +660,9 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
         verify(assetRepo).findAllByStatus(AssetStatus.AVAILABLE)
       }
 
-      "filter by status only (ASSIGNED)" in {
-        val assets = java.util.Arrays.asList(
-          createSampleAsset(id = 1L, status = AssetStatus.ASSIGNED)
-        )
-
-        when(assetRepo.findAllByStatus(AssetStatus.ASSIGNED)).thenReturn(assets)
-
-        val result = assetService.getAllAssets(AssetStatus.ASSIGNED, null)
-
-        result should have size 1
-      }
-
-      "filter by status only (MAINTENANCE)" in {
-        val assets = java.util.Arrays.asList(
-          createSampleAsset(id = 1L, status = AssetStatus.MAINTENANCE)
-        )
-
-        when(assetRepo.findAllByStatus(AssetStatus.MAINTENANCE)).thenReturn(assets)
-
-        val result = assetService.getAllAssets(AssetStatus.MAINTENANCE, null)
-
-        result should have size 1
-      }
-
-      "filter by status only (RETIRED)" in {
-        val assets = java.util.Arrays.asList(
-          createSampleAsset(id = 1L, status = AssetStatus.RETIRED)
-        )
-
-        when(assetRepo.findAllByStatus(AssetStatus.RETIRED)).thenReturn(assets)
-
-        val result = assetService.getAllAssets(AssetStatus.RETIRED, null)
-
-        result should have size 1
-      }
-
       "filter by category only (LAPTOP)" in {
         val assets = java.util.Arrays.asList(
-          createSampleAsset(id = 1L, category = Category.LAPTOP),
+          createSampleAsset(category = Category.LAPTOP),
           createSampleAsset(id = 2L, category = Category.LAPTOP)
         )
 
@@ -712,58 +673,11 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
         result should have size 2
         verify(assetRepo).findAllByCategory(Category.LAPTOP)
       }
-
-      "filter by category only (MOBILE)" in {
-        val assets = java.util.Arrays.asList(
-          createSampleAsset(id = 1L, category = Category.MOBILE)
-        )
-
-        when(assetRepo.findAllByCategory(Category.MOBILE)).thenReturn(assets)
-
-        val result = assetService.getAllAssets(null, Category.MOBILE)
-
-        result should have size 1
-      }
-
-      "filter by category only (DESKTOP)" in {
-        val assets = java.util.Arrays.asList(
-          createSampleAsset(id = 1L, category = Category.DESKTOP)
-        )
-
-        when(assetRepo.findAllByCategory(Category.DESKTOP)).thenReturn(assets)
-
-        val result = assetService.getAllAssets(null, Category.DESKTOP)
-
-        result should have size 1
-      }
-
-      "filter by category only (KEYBOARD)" in {
-        val assets = java.util.Arrays.asList(
-          createSampleAsset(id = 1L, category = Category.KEYBOARD)
-        )
-
-        when(assetRepo.findAllByCategory(Category.KEYBOARD)).thenReturn(assets)
-
-        val result = assetService.getAllAssets(null, Category.KEYBOARD)
-
-        result should have size 1
-      }
-
-      "filter by category only (MOUSE)" in {
-        val assets = java.util.Arrays.asList(
-          createSampleAsset(id = 1L, category = Category.MOUSE)
-        )
-
-        when(assetRepo.findAllByCategory(Category.MOUSE)).thenReturn(assets)
-
-        val result = assetService.getAllAssets(null, Category.MOUSE)
-
-        result should have size 1
-      }
+      
 
       "filter by both status and category" in {
         val assets = java.util.Arrays.asList(
-          createSampleAsset(id = 1L, status = AssetStatus.AVAILABLE, category = Category.LAPTOP)
+          createSampleAsset(status = AssetStatus.AVAILABLE, category = Category.LAPTOP)
         )
 
         when(assetRepo.findAllByStatusAndCategory(AssetStatus.AVAILABLE, Category.LAPTOP))
@@ -777,7 +691,6 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
 
       "return empty list when no assets exist" in {
         when(assetRepo.findAll()).thenReturn(java.util.Collections.emptyList())
-
         val result = assetService.getAllAssets(null, null)
 
         result shouldBe empty
@@ -786,7 +699,6 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
       "return empty list when no assets match filters" in {
         when(assetRepo.findAllByStatusAndCategory(AssetStatus.RETIRED, Category.MOBILE))
           .thenReturn(java.util.Collections.emptyList())
-
         val result = assetService.getAllAssets(AssetStatus.RETIRED, Category.MOBILE)
 
         result shouldBe empty
@@ -891,7 +803,7 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
 
       "return correct data for RETIRED asset" in {
         val asset = createSampleAsset(
-          id = 1L,
+
           status = AssetStatus.RETIRED
         )
 

@@ -5,33 +5,36 @@ import com.example.demo.Model.Asset
 import com.example.demo.Model.Enums.{AssetStatus, Category}
 import com.example.demo.Service.AssetService
 import jakarta.persistence.PostLoad
+import jakarta.validation.Valid
 import org.springframework.http.{HttpStatus, ResponseEntity}
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.{CrossOrigin, DeleteMapping, GetMapping, PatchMapping, PathVariable, PostMapping, RequestBody, RequestMapping, RequestParam, RequestPart, ResponseBody, RestController}
 
 
 @RestController
 @RequestMapping(value = Array("/api/asset"))
 @CrossOrigin(origins = Array("*"))
+@Validated
 class AssetController(assetService: AssetService) {
 
   @PostMapping(value = Array("/create"))
   @PreAuthorize("hasRole('ADMIN')")
-  def createAsset(@RequestBody asset: AssetCreationDTO): ResponseEntity[AssetResponseDTO] = {
+  def createAsset(@Valid @RequestBody asset: AssetCreationDTO): ResponseEntity[AssetResponseDTO] = {
     val newAsset: AssetResponseDTO = assetService.createAsset(asset)
     new ResponseEntity[AssetResponseDTO](newAsset, HttpStatus.CREATED)
   }
 
   @PatchMapping(value = Array("/status/{assetId}"))
   @PreAuthorize("hasRole('ADMIN')")
-  def updateAssetStatusById(@RequestBody assetDTO: AssetStatusDTO, @PathVariable assetId: Long): ResponseEntity[AssetResponseDTO] = {
+  def updateAssetStatusById(@Valid @RequestBody assetDTO: AssetStatusDTO, @PathVariable assetId: Long): ResponseEntity[AssetResponseDTO] = {
     val updatedAsset: AssetResponseDTO = assetService.updateAssetStatusById(assetId, assetDTO)
     new ResponseEntity[AssetResponseDTO](updatedAsset, HttpStatus.OK)
   }
   
   @PatchMapping(value = Array("/{assetId}"))
   @PreAuthorize("hasRole('ADMIN')")
-  def updateAssetById(@RequestBody assetDTO: AssetUpdateDTO, @PathVariable assetId: Long): ResponseEntity[AssetResponseDTO] = {
+  def updateAssetById(@Valid @RequestBody assetDTO: AssetUpdateDTO, @PathVariable assetId: Long): ResponseEntity[AssetResponseDTO] = {
     val updatedAsset: AssetResponseDTO = assetService.updateAssetById(assetId, assetDTO)
     new ResponseEntity[AssetResponseDTO](updatedAsset, HttpStatus.OK)
   }

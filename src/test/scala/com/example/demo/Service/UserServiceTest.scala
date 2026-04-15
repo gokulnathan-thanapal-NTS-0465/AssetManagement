@@ -125,10 +125,10 @@ class UserServiceTest extends AnyWordSpec with Matchers with MockitoSugar with B
     "createUser" should {
       "create user successfully with valid data" in {
         val dto = UserCreateDTO(
-          username = Some("gokul"),
-          passwordHash = Some("password123"),
-          userType = Some(UserType.EMPLOYEE),
-          department = Some("IT"),
+          username = "gokul",
+          passwordHash = "password123",
+          userType = UserType.EMPLOYEE,
+          department = "IT",
           creditBalance = Some(100)
         )
 
@@ -144,23 +144,14 @@ class UserServiceTest extends AnyWordSpec with Matchers with MockitoSugar with B
         result.username shouldBe "gokul"
         verify(userRepo).save(ArgumentMatchers.any[User])
       }
-      "throw IllegalArgumentException when username missing" in {
-        val dto = UserCreateDTO(
-          username = None,
-          passwordHash = Some("pass"),
-          department = Some("IT")
-        )
 
-        an[IllegalArgumentException] should be thrownBy {
-          userService.createUser(dto)
-        }
-      }
 
       "throw IllegalStateException when username exist" in {
         val dto = UserCreateDTO(
-          username = Some("gokul"),
-          passwordHash = Some("pass"),
-          department = Some("IT")
+          username = "gokul",
+          passwordHash = "pass",
+          department = "IT",
+          userType=UserType.EMPLOYEE
         )
 
         when(userRepo.findAllByUsername("gokul")).thenReturn(java.util.Arrays.asList(createSampleUser()))
@@ -172,9 +163,10 @@ class UserServiceTest extends AnyWordSpec with Matchers with MockitoSugar with B
 
       "throw IllegalArgumentException when password missing" in {
         val dto = UserCreateDTO(
-          username = Some("gokul"),
-          passwordHash = None,
-          department = Some("IT")
+          username = "gokul",
+          passwordHash =null,
+          department = "IT",
+          userType=UserType.EMPLOYEE
         )
 
         when(userRepo.findAllByUsername("gokul")).thenReturn(java.util.Collections.emptyList())
@@ -182,6 +174,20 @@ class UserServiceTest extends AnyWordSpec with Matchers with MockitoSugar with B
         the[IllegalArgumentException] thrownBy {
           userService.createUser(dto)
         } should have message "Password required"
+      }
+      "throw IllegalArgumentException when username missing" in {
+        val dto = UserCreateDTO(
+          username = null,
+          passwordHash = "gokul123",
+          department = "IT",
+          userType = UserType.EMPLOYEE
+        )
+
+        when(userRepo.findAllByUsername("gokul")).thenReturn(java.util.Collections.emptyList())
+
+        the[IllegalArgumentException] thrownBy {
+          userService.createUser(dto)
+        } should have message "Username is required"
       }
 
 
@@ -340,7 +346,7 @@ class UserServiceTest extends AnyWordSpec with Matchers with MockitoSugar with B
       }
 
       "throw IllegalArgumentException when new department is same as current" in {
-        val existingUser = createSampleUser(id = 1L)
+        val existingUser = createSampleUser()
         val dto = UserDepartmentDTO(department = Some("IT"))
 
         when(userRepo.findById(1L)).thenReturn(Optional.of(existingUser))

@@ -1,6 +1,6 @@
 package com.example.demo.Service
 
-import com.example.demo.DTO.{AssetAssignmentDTO, AssetRequestDTO, AssetRequestResponseDTO}
+import com.example.demo.DTO.{AssetAssignmentDTO, AssetAssignmentResponseDTO, AssetRequestDTO, AssetRequestResponseDTO}
 import com.example.demo.Mapper.{AssetAssignmentMapper, AssetRequestMapper}
 import com.example.demo.Model.Enums.AssetStatus.AVAILABLE
 import com.example.demo.Model.{Asset, AssetAssignment, AssetRequest, Credit, User}
@@ -42,7 +42,7 @@ class AssetRequestService(userRepo: UserRepository, assetRequestRepo: AssetReque
   }
 
   @Transactional
-  def acceptRequest(requestId: Long): AssetAssignmentDTO = {
+  def acceptRequest(requestId: Long): AssetAssignmentResponseDTO = {
     var assetRequest: AssetRequest = assetRequestRepo.findById(requestId).orElseThrow(()=>new EntityNotFoundException("Asset request not found"))
     if (assetRequest.status != RequestStatus.PENDING) {
       throw new IllegalStateException("Request is not pending")
@@ -74,7 +74,7 @@ class AssetRequestService(userRepo: UserRepository, assetRequestRepo: AssetReque
     asset.status = AssetStatus.ASSIGNED
     asset = assetRepo.save(asset)
 
-    val assetAssignmentDTO = AssetAssignmentMapper.toAssetAssignmentDTO(assetAssignment)
+    val assetAssignmentDTO = AssetAssignmentMapper.toAssetAssignmentResponseDTO(assetAssignment)
     assetAssignmentDTO
   }
 

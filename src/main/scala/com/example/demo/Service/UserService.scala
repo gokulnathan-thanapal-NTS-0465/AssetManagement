@@ -1,6 +1,6 @@
 package com.example.demo.Service
 
-import com.example.demo.DTO.{UserCreateDTO, UserCredentialDTO, UserDepartmentDTO, UserResponseDTO, UserUpdateDTO}
+import com.example.demo.DTO.{UserCreateDTO, UserCredentialDTO, UserDepartmentDTO, UserResponseDTO}
 import com.example.demo.Mapper.UserMapper
 import com.example.demo.Model.Enums.{AssetStatus, ComplaintStatus, RequestStatus, UserType}
 import org.springframework.stereotype.Service
@@ -21,13 +21,19 @@ class UserService @Autowired(userRepo: UserRepository, passwordEncoder: Password
   @Transactional
   def createUser(dto: UserCreateDTO): UserResponseDTO = {
 
-    val userName: String = dto.username.getOrElse(throw new IllegalArgumentException("Username is required"))
-    if(userRepo.findAllByUsername(userName).size()>0){
+    if (dto.username == null || dto.username.isEmpty) {
+      throw new IllegalArgumentException("Username is required")
+    }
+    if (dto.passwordHash == null || dto.passwordHash.isEmpty) {
+      throw new IllegalArgumentException("Password required")
+    }
+
+    if(userRepo.findAllByUsername(dto.username).size()>0){
       throw new IllegalStateException("Username already exists")
     }
     var user = UserMapper.toEntity(dto)
     val generatedUserId: String = generateUserId(user.userType)
-    val passwordEncoded = passwordEncoder.encode(dto.passwordHash.getOrElse(throw new IllegalArgumentException("Password required")))
+    val passwordEncoded = passwordEncoder.encode(dto.passwordHash)
     user.employeeId = generatedUserId
     user.passwordHash = passwordEncoded
     user = userRepo.save(user)

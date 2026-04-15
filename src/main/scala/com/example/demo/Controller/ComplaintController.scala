@@ -3,26 +3,29 @@ package com.example.demo.Controller
 import com.example.demo.DTO.{ComplaintCreationDTO, ComplaintResponseDTO, ComplaintStatsDTO}
 import com.example.demo.Model.Enums.ComplaintStatus
 import com.example.demo.Service.ComplaintService
+import jakarta.validation.Valid
 import org.springframework.http.{HttpStatus, ResponseEntity}
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.{CrossOrigin, GetMapping, PatchMapping, PathVariable, PostMapping, RequestBody, RequestMapping, RequestParam, RestController}
 
 
 @RestController
 @RequestMapping(value = Array("/api/complaint"))
 @CrossOrigin(origins = Array("*"))
+@Validated
 class ComplaintController(complaintService: ComplaintService) {
 
   @PostMapping(value = Array("/create"))
   @PreAuthorize("hasRole('EMPLOYEE')")
-  def createComplaint(@RequestBody complaintDTO: ComplaintCreationDTO): ResponseEntity[ComplaintResponseDTO] = {
+  def createComplaint(@Valid @RequestBody complaintDTO: ComplaintCreationDTO): ResponseEntity[ComplaintResponseDTO] = {
     val complaintResponseDTO: ComplaintResponseDTO = complaintService.createComplaint(complaintDTO)
     new ResponseEntity[ComplaintResponseDTO](complaintResponseDTO, HttpStatus.CREATED)
   }
 
   @PostMapping(value=Array("/admin/create"))
   @PreAuthorize("hasRole('ADMIN')")
-  def createComplaintAdmin(@RequestBody complaintDTO:ComplaintCreationDTO):ResponseEntity[ComplaintResponseDTO]={
+  def createComplaintAdmin(@Valid @RequestBody complaintDTO:ComplaintCreationDTO):ResponseEntity[ComplaintResponseDTO]={
     val complaintResponseDTO: ComplaintResponseDTO = complaintService.createComplaintAdmin(complaintDTO)
     new ResponseEntity[ComplaintResponseDTO](complaintResponseDTO, HttpStatus.CREATED)
   }
