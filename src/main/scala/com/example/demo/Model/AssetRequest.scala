@@ -10,7 +10,7 @@ import scala.beans.BeanProperty
 class AssetRequest {
 
   @Id
-  @GeneratedValue(GenerationType.IDENTITY)
+  @GeneratedValue(strategy=GenerationType.IDENTITY)
   @Column(nullable = false)
   @BeanProperty
   var id: Long = _

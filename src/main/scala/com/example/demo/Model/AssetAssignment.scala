@@ -11,7 +11,7 @@ import scala.beans.BeanProperty
 class AssetAssignment {
 
   @Id
-  @GeneratedValue(GenerationType.IDENTITY)
+  @GeneratedValue(strategy=GenerationType.IDENTITY)
   @Column(nullable = false)
   @BeanProperty
   var id: Long = _

@@ -9,7 +9,7 @@ import scala.beans.BeanProperty
 @Table(name = "Complaints")
 class Complaint {
   @Id
-  @GeneratedValue(GenerationType.IDENTITY)
+  @GeneratedValue(strategy=GenerationType.IDENTITY)
   @Column(nullable = false)
   @BeanProperty
   var id: Long = _

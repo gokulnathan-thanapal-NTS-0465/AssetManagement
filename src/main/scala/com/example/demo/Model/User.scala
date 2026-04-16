@@ -12,7 +12,7 @@ import scala.beans.BeanProperty
 @Table(name = "Users" )
 class User {
   @Id
-  @GeneratedValue(GenerationType.IDENTITY)
+  @GeneratedValue(strategy=GenerationType.IDENTITY)
   @Column(nullable = false)
   @BeanProperty
   var id: Long = _
