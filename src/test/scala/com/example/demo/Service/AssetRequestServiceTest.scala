@@ -6,7 +6,7 @@ import com.example.demo.Model.Enums.{AssetStatus, Category, RequestStatus, UserT
 import com.example.demo.Repo.{AssetAssignmentRepository, AssetRepository, AssetRequestRepository, UserRepository}
 import jakarta.persistence.EntityNotFoundException
 import org.mockito.ArgumentMatchers
-import org.mockito.Mockito.{ verify, when}
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -14,15 +14,16 @@ import org.scalatestplus.mockito.MockitoSugar
 
 import java.time.{LocalDate, LocalDateTime}
 import java.util.Optional
+import scala.compiletime.uninitialized
 
 class AssetRequestServiceTest extends AnyWordSpec with Matchers with MockitoSugar with BeforeAndAfterEach {
 
-  var userRepo: UserRepository = _
-  var assetRequestRepo: AssetRequestRepository = _
-  var assetRepo: AssetRepository = _
-  var assetAssignmentRepo: AssetAssignmentRepository = _
+  var userRepo: UserRepository = uninitialized
+  var assetRequestRepo: AssetRequestRepository = uninitialized
+  var assetRepo: AssetRepository = uninitialized
+  var assetAssignmentRepo: AssetAssignmentRepository = uninitialized
 
-  var assetRequestService: AssetRequestService = _
+  var assetRequestService: AssetRequestService = uninitialized
 
   override def beforeEach(): Unit = {
     userRepo = mock[UserRepository]
@@ -113,15 +114,14 @@ class AssetRequestServiceTest extends AnyWordSpec with Matchers with MockitoSuga
     "createRequest" should {
 
       "create request successfully with valid data" in {
-        val user = createSampleUser(creditBalance = 100)
+        val user = createSampleUser()
         val dto = AssetRequestDTO(
-          userId = Some("1"),
-          category = Some(Category.LAPTOP),
-          reason = Some("Need laptop for development")
+          userId = "1",
+          category = Category.LAPTOP,
+          reason = "Need laptop for development"
         )
 
         val savedRequest = createSampleAssetRequest(
-          id = 1L,
           user = user,
           category = Category.LAPTOP,
           reason = "Need laptop for development"
@@ -137,40 +137,14 @@ class AssetRequestServiceTest extends AnyWordSpec with Matchers with MockitoSuga
         result.status shouldBe RequestStatus.PENDING
         verify(assetRequestRepo).save(ArgumentMatchers.any[AssetRequest])
       }
-
-      "throw IllegalArgumentException when userId is missing" in {
-        val dto = AssetRequestDTO(
-          userId = None,
-          category = Some(Category.LAPTOP),
-          reason = Some("Need laptop")
-        )
-
-        the[IllegalArgumentException] thrownBy {
-          assetRequestService.createRequest(dto)
-        } should have message "User ID is required"
-      }
-
-      "throw IllegalArgumentException when category is missing" in {
-        val user = createSampleUser()
-        val dto = AssetRequestDTO(
-          userId = Some("1"),
-          category = None,
-          reason = Some("Need device")
-        )
-
-        when(userRepo.getUserById(1L)).thenReturn(user)
-
-        the[IllegalArgumentException] thrownBy {
-          assetRequestService.createRequest(dto)
-        } should have message "Category is required"
-      }
+      
 
       "throw IllegalStateException when user has insufficient credit balance for LAPTOP" in {
         val user = createSampleUser(creditBalance = 50)
         val dto = AssetRequestDTO(
-          userId = Some("1"),
-          category = Some(Category.LAPTOP),
-          reason = Some("Need laptop")
+          userId = "1",
+          category = Category.LAPTOP,
+          reason = "Need laptop"
         )
 
         when(userRepo.getUserById(1L)).thenReturn(user)
@@ -183,9 +157,9 @@ class AssetRequestServiceTest extends AnyWordSpec with Matchers with MockitoSuga
       "throw IllegalStateException when user has insufficient credit balance for MOBILE" in {
         val user = createSampleUser(creditBalance = 30)
         val dto = AssetRequestDTO(
-          userId = Some("1"),
-          category = Some(Category.MOBILE),
-          reason = Some("Need mobile")
+          userId = "1",
+          category = Category.MOBILE,
+          reason = "Need mobile"
         )
 
         when(userRepo.getUserById(1L)).thenReturn(user)
@@ -198,9 +172,9 @@ class AssetRequestServiceTest extends AnyWordSpec with Matchers with MockitoSuga
       "throw IllegalStateException when user has insufficient credit balance for DESKTOP" in {
         val user = createSampleUser(creditBalance = 50)
         val dto = AssetRequestDTO(
-          userId = Some("1"),
-          category = Some(Category.DESKTOP),
-          reason = Some("Need desktop")
+          userId = "1",
+          category = Category.DESKTOP,
+          reason = "Need desktop"
         )
 
         when(userRepo.getUserById(1L)).thenReturn(user)
@@ -213,9 +187,9 @@ class AssetRequestServiceTest extends AnyWordSpec with Matchers with MockitoSuga
       "create request successfully when credit balance is exactly equal to required" in {
         val user = createSampleUser(creditBalance = 75)
         val dto = AssetRequestDTO(
-          userId = Some("1"),
-          category = Some(Category.LAPTOP),
-          reason = Some("Need laptop")
+          userId = "1",
+          category = Category.LAPTOP,
+          reason = "Need laptop"
         )
 
         val savedRequest = createSampleAssetRequest(user = user, category = Category.LAPTOP)
@@ -232,9 +206,9 @@ class AssetRequestServiceTest extends AnyWordSpec with Matchers with MockitoSuga
       "throw RuntimeException when reason is missing (from mapper)" in {
         val user = createSampleUser()
         val dto = AssetRequestDTO(
-          userId = Some("1"),
-          category = Some(Category.LAPTOP),
-          reason = None
+          userId = "1",
+          category = Category.LAPTOP,
+          reason = ""
         )
 
         when(userRepo.getUserById(1L)).thenReturn(user)
@@ -247,9 +221,9 @@ class AssetRequestServiceTest extends AnyWordSpec with Matchers with MockitoSuga
       "create request successfully for MOUSE category with low credit" in {
         val user = createSampleUser(creditBalance = 15)
         val dto = AssetRequestDTO(
-          userId = Some("1"),
-          category = Some(Category.MOUSE),
-          reason = Some("Need mouse")
+          userId = "1",
+          category = Category.MOUSE,
+          reason = "Need mouse"
         )
 
         val savedRequest = createSampleAssetRequest(user = user, category = Category.MOUSE)
@@ -265,9 +239,9 @@ class AssetRequestServiceTest extends AnyWordSpec with Matchers with MockitoSuga
       "create request successfully for KEYBOARD category" in {
         val user = createSampleUser(creditBalance = 50)
         val dto = AssetRequestDTO(
-          userId = Some("1"),
-          category = Some(Category.KEYBOARD),
-          reason = Some("Need keyboard")
+          userId = "1",
+          category = Category.KEYBOARD,
+          reason = "Need keyboard"
         )
 
         val savedRequest = createSampleAssetRequest(user = user, category = Category.KEYBOARD)
@@ -283,9 +257,9 @@ class AssetRequestServiceTest extends AnyWordSpec with Matchers with MockitoSuga
       "set request status as PENDING for new request" in {
         val user = createSampleUser()
         val dto = AssetRequestDTO(
-          userId = Some("1"),
-          category = Some(Category.LAPTOP),
-          reason = Some("Need laptop")
+          userId = "1",
+          category = Category.LAPTOP,
+          reason = "Need laptop"
         )
 
         val savedRequest = createSampleAssetRequest(user = user, status = RequestStatus.PENDING)

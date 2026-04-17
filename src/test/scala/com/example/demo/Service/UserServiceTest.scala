@@ -16,17 +16,18 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import java.time.{LocalDate, LocalDateTime}
 import java.util
 import java.util.Optional
+import scala.compiletime.uninitialized
 
 class UserServiceTest extends AnyWordSpec with Matchers with MockitoSugar with BeforeAndAfterEach {
 
-  var userRepo: UserRepository = _
-  var passwordEncoder: PasswordEncoder = _
-  var assetAssignmentRepo: AssetAssignmentRepository = _
-  var complaintRepo: ComplaintRepository = _
-  var assetRequestRepo: AssetRequestRepository = _
-  var assetRepo: AssetRepository = _
+  var userRepo: UserRepository = uninitialized
+  var passwordEncoder: PasswordEncoder = uninitialized
+  var assetAssignmentRepo: AssetAssignmentRepository = uninitialized
+  var complaintRepo: ComplaintRepository = uninitialized
+  var assetRequestRepo: AssetRequestRepository = uninitialized
+  var assetRepo: AssetRepository = uninitialized
 
-  var userService: UserService = _
+  var userService: UserService = uninitialized
 
 
   override def beforeEach(): Unit = {

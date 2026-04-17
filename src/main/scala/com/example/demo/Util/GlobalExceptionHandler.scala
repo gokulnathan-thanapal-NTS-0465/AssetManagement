@@ -8,14 +8,16 @@ import org.springframework.validation.FieldError
 import org.springframework.web.bind.annotation.{ControllerAdvice, ExceptionHandler}
 import org.springframework.web.bind.{MethodArgumentNotValidException, MissingServletRequestParameterException}
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
+
 import scala.jdk.CollectionConverters.*
 import java.time.LocalDateTime
+import scala.compiletime.uninitialized
 
 class ErrorResponse {
-   var timestamp: LocalDateTime = _
-   var status: Int = _
-   var error: String = _
-   var message: String = _
+   var timestamp: LocalDateTime = uninitialized
+   var status: Int = uninitialized
+   var error: String = uninitialized
+   var message: String = uninitialized
 }
 
 object ErrorResponse {

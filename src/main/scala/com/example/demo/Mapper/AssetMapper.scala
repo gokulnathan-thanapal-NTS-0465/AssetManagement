@@ -7,20 +7,24 @@ import com.example.demo.Model.Enums.{AssetStatus, Category}
 
 object AssetMapper {
   def toEntity(dto: AssetCreationDTO, asset: Asset): Asset = {
-    asset.modelName = dto.modelName.getOrElse(
-      throw new IllegalArgumentException("Model name required")
-    )
+    asset.modelName = dto.modelName
     asset.status = AssetStatus.AVAILABLE
-    asset.category = dto.category.getOrElse(
-      throw new IllegalArgumentException("Category required")
-    )
+    asset.category=dto.category
     asset
   }
 
 
   def updateEntity(dto: AssetUpdateDTO, asset: Asset): Asset = {
-    asset.modelName = dto.modelName.getOrElse(throw  new IllegalArgumentException("Model name required"))
-    asset
+    println("Model name :: "+dto.modelName)
+    if(dto.modelName !=null ){
+      asset.modelName = dto.modelName
+      asset
+    }
+    else {
+      println("Model name is empty or null")
+      throw new IllegalArgumentException("Model name required")
+    }
+
   }
 
   def toResponse(asset: Asset): AssetResponseDTO = {

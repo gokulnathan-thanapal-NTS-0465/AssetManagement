@@ -7,6 +7,7 @@ import jakarta.persistence.{Column, Entity, EnumType, Enumerated, GeneratedValue
 import java.time.LocalDate
 import java.util.Date
 import scala.beans.BeanProperty
+import scala.compiletime.uninitialized
 
 @Entity
 @Table(name = "Users" )
@@ -15,38 +16,38 @@ class User {
   @GeneratedValue(strategy=GenerationType.IDENTITY)
   @Column(nullable = false)
   @BeanProperty
-  var id: Long = _
+  var id: Long = uninitialized
 
   @Column(nullable = false)
   @BeanProperty
-  var username: String = _
+  var username: String = uninitialized
 
   @Column(name = "password_hash", nullable = false)
   @BeanProperty
-  var passwordHash: String = _
+  var passwordHash: String = uninitialized
 
   @Enumerated(EnumType.STRING)
   @Column(name = "user_type", nullable = false)
   @BeanProperty
-  var userType: UserType = _
+  var userType: UserType = uninitialized
 
   @Column(name = "credit_balance")
   @BeanProperty
-  var creditBalance: Int = _
+  var creditBalance: Int = uninitialized
 
   @Column(name = "employee_id", nullable = false)
   @BeanProperty
-  var employeeId: String = _
+  var employeeId: String = uninitialized
 
   @Column(name = "joined_date")
   @BeanProperty
-  var joinedDate: LocalDate = _
+  var joinedDate: LocalDate = uninitialized
 
   @Column(nullable = false)
   @BeanProperty
-  var department: String = _
+  var department: String = uninitialized
   
   @Column(nullable = false)
   @BeanProperty
-  var deactivated:Boolean= _
+  var deactivated:Boolean= uninitialized
 }

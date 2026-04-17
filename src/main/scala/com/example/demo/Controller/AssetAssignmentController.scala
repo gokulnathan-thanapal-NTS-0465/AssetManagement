@@ -25,7 +25,7 @@ class AssetAssignmentController(assetAssignmentService: AssetAssignmentService) 
 
   @GetMapping(value = Array("/{assignmentId}"))
   @PreAuthorize("hasRole('ADMIN') or (hasRole('EMPLOYEE') and @authService.canAccessAssignment(#assignmentId))")
-  def getAssetAssignmentById(assignmentId: Long): ResponseEntity[AssetAssignmentResponseDTO] = {
+  def getAssetAssignmentById(@PathVariable assignmentId: Long): ResponseEntity[AssetAssignmentResponseDTO] = {
     val assetAssignment: AssetAssignmentResponseDTO = assetAssignmentService.getAssetAssignmentById(assignmentId)
     new ResponseEntity[AssetAssignmentResponseDTO](assetAssignment, HttpStatus.OK)
   }

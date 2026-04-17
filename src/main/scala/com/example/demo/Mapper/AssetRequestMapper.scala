@@ -10,12 +10,8 @@ object AssetRequestMapper {
   def toEntity(dto: AssetRequestDTO, user: User): AssetRequest = {
     val assetRequest = new AssetRequest
     assetRequest.user = user
-    assetRequest.category = dto.category.getOrElse(
-      throw new RuntimeException("Category required")
-    )
-    assetRequest.reason = dto.reason.getOrElse(
-      throw new RuntimeException("Reason required")
-    )
+    assetRequest.category = dto.category
+    assetRequest.reason = dto.reason
     assetRequest.status = RequestStatus.PENDING
     assetRequest
   }

@@ -11,7 +11,7 @@ object ComplaintMapper {
     complaint.user = user
     complaint.asset = asset
     complaint.status = ComplaintStatus.OPEN
-    complaint.description = dto.description.getOrElse("Description not provided")
+    complaint.description = dto.description
     complaint
   }
 

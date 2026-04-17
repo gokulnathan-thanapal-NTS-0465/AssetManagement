@@ -19,11 +19,11 @@ class ComplaintService(userRepo: UserRepository, complaintRepo: ComplaintReposit
   @Transactional
   def createComplaint(complaintCreationDTO: ComplaintCreationDTO): ComplaintResponseDTO = {
 
-    val userId:String=complaintCreationDTO.userId.getOrElse(throw new IllegalArgumentException("User ID is required"))
+    val userId:String=complaintCreationDTO.userId
 
     val user: User = userRepo.findById(userId.toLong).orElseThrow(() => EntityNotFoundException("User not found"))
 
-    val assetId:String=complaintCreationDTO.assetId.getOrElse(throw new IllegalArgumentException("Asset ID is required"))
+    val assetId:String=complaintCreationDTO.assetId
     val asset: Asset = assetRepo.findById(assetId.toLong).orElseThrow(() => EntityNotFoundException("Asset not found"))
 
     if (!isAssetBelongsToUser(user, asset)) {
@@ -43,10 +43,10 @@ class ComplaintService(userRepo: UserRepository, complaintRepo: ComplaintReposit
 
   def createComplaintAdmin(complaintCreationDTO: ComplaintCreationDTO): ComplaintResponseDTO = {
 
-    val assetId:String=complaintCreationDTO.assetId.getOrElse(throw new IllegalArgumentException("Asset ID is required"))
+    val assetId:String=complaintCreationDTO.assetId
     val asset: Asset = assetRepo.findById(assetId.toLong).orElseThrow(() => EntityNotFoundException("Asset not found"))
 
-    val userId:String=complaintCreationDTO.userId.getOrElse(throw new IllegalArgumentException("User ID is required"))
+    val userId:String=complaintCreationDTO.userId
     val user: User = userRepo.findById(userId.toLong).orElseThrow(() => EntityNotFoundException("User not found"))
 
     if (asset.status != AssetStatus.AVAILABLE) {

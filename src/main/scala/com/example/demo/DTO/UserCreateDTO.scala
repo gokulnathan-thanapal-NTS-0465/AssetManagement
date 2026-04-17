@@ -3,7 +3,7 @@ package com.example.demo.DTO
 
 import com.example.demo.Model.Enums.UserType
 import com.fasterxml.jackson.annotation.{JsonInclude, JsonProperty}
-import jakarta.validation.constraints.{NotBlank, Pattern, Size}
+import jakarta.validation.constraints.{NotBlank, NotNull, Pattern, Size}
 
 import scala.annotation.meta.field
 import scala.beans.BeanProperty
@@ -18,7 +18,7 @@ case class UserCreateDTO(
                           username: String ,
 
                           @BeanProperty
-                          @(NotBlank @field)(message = "UserType is required")
+                          @(NotNull @field)(message = "UserType is required")
                           userType: UserType,
 
                           @BeanProperty

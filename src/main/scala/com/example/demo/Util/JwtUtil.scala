@@ -6,17 +6,18 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import com.example.demo.Model.Enums.UserType
 
-import java.util.{Date, HashMap => JHashMap}
+import java.util.{Date, HashMap as JHashMap}
 import javax.crypto.SecretKey
+import scala.compiletime.uninitialized
 
 @Component
 class JwtUtil {
 
   @Value("${jwt.secret}")
-  private var secret: String = _
+  private var secret: String = uninitialized
 
   @Value("${jwt.expiration}")
-  private var expiration: Long = _
+  private var expiration: Long = uninitialized
 
   private def getSigningKey: SecretKey = {
     Keys.hmacShaKeyFor(secret.getBytes("UTF-8"))

@@ -21,15 +21,11 @@ class AssetRequestService(userRepo: UserRepository, assetRequestRepo: AssetReque
 
   @Transactional
   def createRequest(request: AssetRequestDTO): AssetRequestResponseDTO = {
-    val userId = request.userId.getOrElse(
-      throw new IllegalArgumentException("User ID is required")
-    )
-    val user = userRepo.getUserById(userId.toLong)
+    val userId = request.userId.toLong
+    val user = userRepo.getUserById(userId)
     
-    val requestedCategory: Category = request.category.getOrElse(
-      throw new IllegalArgumentException("Category is required")
-    )
-    val requiredCredit: Int = Credit.creditRequirements.getOrElse(requestedCategory, throw new IllegalArgumentException("Invalid category"))
+    val requestedCategory: Category = request.category
+    val requiredCredit: Int = Credit.creditRequirements.getOrElse(requestedCategory, throw new IllegalArgumentException("Category is required"))
     
     if (user.creditBalance < requiredCredit) {
       throw new IllegalStateException("Insufficient credit balance")
@@ -52,7 +48,7 @@ class AssetRequestService(userRepo: UserRepository, assetRequestRepo: AssetReque
     
     val requiredCredit: Int = Credit
       .creditRequirements
-      .getOrElse(requestedCategory, throw new IllegalArgumentException("Invalid category"))
+      .getOrElse(requestedCategory, throw new IllegalArgumentException("Category is required"))
 
     if (user.creditBalance < requiredCredit) {
       throw new IllegalStateException("Insufficient credit balance")

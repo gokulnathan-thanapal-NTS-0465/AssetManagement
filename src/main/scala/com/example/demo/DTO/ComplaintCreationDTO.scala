@@ -8,14 +8,15 @@ case class ComplaintCreationDTO(
 
                                  @BeanProperty
                                  @NotBlank(message="User Id is required")
-                                 userId: Option[String] = None,
+                                 userId: String ,
 
                                  @BeanProperty
                                  @NotBlank(message="Asset Id is required")
-                                 assetId: Option[String] = None,
+                                 assetId: String,
 
                                  @BeanProperty
                                  @Size(min= 10 , max=100 , message = "Description must be between 10 and 100 characters")
-                                 description: Option[String] = None
+                                 @NotBlank(message="Description is required")
+                                 description: String
                                )
 

@@ -1,8 +1,10 @@
 package com.example.demo.DTO
 
- class ComplaintStatsDTO{
-                            var totalComplaints:Long =_
-                            var open: Long = _
-                            var resolved: Long = _
-                            var inProgress :Long = _
+import scala.compiletime.uninitialized
+
+class ComplaintStatsDTO{
+                            var totalComplaints:Long =uninitialized
+                            var open: Long = uninitialized
+                            var resolved: Long = uninitialized
+                            var inProgress :Long = uninitialized
 }

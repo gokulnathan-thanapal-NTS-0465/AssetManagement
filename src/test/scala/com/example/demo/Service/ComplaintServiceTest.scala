@@ -14,14 +14,15 @@ import org.scalatestplus.mockito.MockitoSugar
 
 import java.time.LocalDate
 import java.util.Optional
+import scala.compiletime.uninitialized
 
 class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar with BeforeAndAfterEach {
 
-  var userRepo: UserRepository = _
-  var complaintRepo: ComplaintRepository = _
-  var assetRepo: AssetRepository = _
+  var userRepo: UserRepository = uninitialized
+  var complaintRepo: ComplaintRepository = uninitialized
+  var assetRepo: AssetRepository = uninitialized
 
-  var complaintService: ComplaintService = _
+  var complaintService: ComplaintService = uninitialized
 
   override def beforeEach(): Unit = {
     userRepo = mock[UserRepository]
@@ -95,9 +96,9 @@ class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar w
         val user = createSampleUser()
         val asset = createSampleAsset(status = AssetStatus.ASSIGNED)
         val dto = ComplaintCreationDTO(
-          userId = Some("1"),
-          assetId = Some("1"),
-          description = Some("Screen is flickering")
+          userId = "1",
+          assetId = "1",
+          description = "Screen is flickering"
         )
 
         val savedComplaint = createSampleComplaint(
@@ -119,23 +120,12 @@ class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar w
         verify(complaintRepo).save(ArgumentMatchers.any[Complaint])
       }
 
-      "throw IllegalArgumentException when userId is not given" in {
-        val dto = ComplaintCreationDTO(
-          userId = None,
-          assetId = Some("1"),
-          description = Some("Issue description")
-        )
-
-        the[IllegalArgumentException] thrownBy {
-          complaintService.createComplaint(dto)
-        } should have message "User ID is required"
-      }
 
       "throw EntityNotFoundException when user is not found" in {
         val dto = ComplaintCreationDTO(
-          userId = Some("999"),
-          assetId = Some("1"),
-          description = Some("Issue description")
+          userId = "999",
+          assetId = "1",
+          description = "Issue description"
         )
 
         when(userRepo.findById(999L)).thenReturn(Optional.empty())
@@ -145,27 +135,13 @@ class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar w
         } should have message "User not found"
       }
 
-      "throw IllegalArgumentException when assetId is not given" in {
-        val user = createSampleUser()
-        val dto = ComplaintCreationDTO(
-          userId = Some("1"),
-          assetId = None,
-          description = Some("Issue description")
-        )
-
-        when(userRepo.findById(1L)).thenReturn(Optional.of(user))
-
-        the[IllegalArgumentException] thrownBy {
-          complaintService.createComplaint(dto)
-        } should have message "Asset ID is required"
-      }
 
       "throw EntityNotFoundException when asset is not found" in {
         val user = createSampleUser()
         val dto = ComplaintCreationDTO(
-          userId = Some("1"),
-          assetId = Some("999"),
-          description = Some("Issue description")
+          userId = "1",
+          assetId = "999",
+          description = "Issue description"
         )
 
         when(userRepo.findById(1L)).thenReturn(Optional.of(user))
@@ -181,9 +157,9 @@ class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar w
         val asset = createSampleAsset(status = AssetStatus.ASSIGNED)
         val otherAsset = createSampleAsset(id = 2L)
         val dto = ComplaintCreationDTO(
-          userId = Some("1"),
-          assetId = Some("1"),
-          description = Some("Issue description")
+          userId = "1",
+          assetId = "1",
+          description = "Issue description"
         )
 
         when(userRepo.findById(1L)).thenReturn(Optional.of(user))
@@ -199,9 +175,9 @@ class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar w
         val user = createSampleUser()
         val asset = createSampleAsset(status = AssetStatus.ASSIGNED)
         val dto = ComplaintCreationDTO(
-          userId = Some("1"),
-          assetId = Some("1"),
-          description = Some("Issue description")
+          userId = "1",
+          assetId = "1",
+          description = "Issue description"
         )
 
         when(userRepo.findById(1L)).thenReturn(Optional.of(user))
@@ -217,9 +193,9 @@ class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar w
         val user = createSampleUser()
         val asset = createSampleAsset(status = AssetStatus.AVAILABLE)
         val dto = ComplaintCreationDTO(
-          userId = Some("1"),
-          assetId = Some("1"),
-          description = Some("Issue description")
+          userId = "1",
+          assetId = "1",
+          description = "Issue description"
         )
 
         when(userRepo.findById(1L)).thenReturn(Optional.of(user))
@@ -235,9 +211,9 @@ class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar w
         val user = createSampleUser()
         val asset = createSampleAsset(status = AssetStatus.MAINTENANCE)
         val dto = ComplaintCreationDTO(
-          userId = Some("1"),
-          assetId = Some("1"),
-          description = Some("Issue description")
+          userId = "1",
+          assetId = "1",
+          description = "Issue description"
         )
 
         when(userRepo.findById(1L)).thenReturn(Optional.of(user))
@@ -253,9 +229,9 @@ class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar w
         val user = createSampleUser()
         val asset = createSampleAsset(status = AssetStatus.RETIRED)
         val dto = ComplaintCreationDTO(
-          userId = Some("1"),
-          assetId = Some("1"),
-          description = Some("Issue description")
+          userId = "1",
+          assetId = "1",
+          description = "Issue description"
         )
 
         when(userRepo.findById(1L)).thenReturn(Optional.of(user))
@@ -271,9 +247,9 @@ class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar w
         val user = createSampleUser()
         val asset = createSampleAsset(status = AssetStatus.ASSIGNED)
         val dto = ComplaintCreationDTO(
-          userId = Some("1"),
-          assetId = Some("1"),
-          description = None
+          userId = "1",
+          assetId = "1",
+          description = ""
         )
 
         val savedComplaint = createSampleComplaint(
@@ -296,9 +272,9 @@ class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar w
         val user = createSampleUser()
         val asset = createSampleAsset(status = AssetStatus.ASSIGNED)
         val dto = ComplaintCreationDTO(
-          userId = Some("1"),
-          assetId = Some("1"),
-          description = Some("Test issue")
+          userId = "1",
+          assetId = "1",
+          description = "Test issue"
         )
 
         val savedComplaint = createSampleComplaint(
@@ -325,9 +301,9 @@ class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar w
         val user = createSampleUser(userType = UserType.ADMIN)
         val asset = createSampleAsset(status = AssetStatus.AVAILABLE)
         val dto = ComplaintCreationDTO(
-          userId = Some("1"),
-          assetId = Some("1"),
-          description = Some("Hardware issue found during inspection")
+          userId = "1",
+          assetId = "1",
+          description = "Hardware issue found during inspection"
         )
 
         val savedComplaint = createSampleComplaint(
@@ -346,23 +322,11 @@ class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar w
         verify(complaintRepo).save(ArgumentMatchers.any[Complaint])
       }
 
-      "throw IllegalArgumentException when assetId is not given" in {
-        val dto = ComplaintCreationDTO(
-          userId = Some("1"),
-          assetId = None,
-          description = Some("Issue description")
-        )
-
-        the[IllegalArgumentException] thrownBy {
-          complaintService.createComplaintAdmin(dto)
-        } should have message "Asset ID is required"
-      }
-
       "throw EntityNotFoundException when asset is not found" in {
         val dto = ComplaintCreationDTO(
-          userId = Some("1"),
-          assetId = Some("999"),
-          description = Some("Issue description")
+          userId = "1",
+          assetId = "999",
+          description = "Issue description"
         )
 
         when(assetRepo.findById(999L)).thenReturn(Optional.empty())
@@ -372,27 +336,13 @@ class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar w
         }
       }
 
-      "throw IllegalArgumentException when userId is not given" in {
-        val asset = createSampleAsset(status = AssetStatus.AVAILABLE)
-        val dto = ComplaintCreationDTO(
-          userId = None,
-          assetId = Some("1"),
-          description = Some("Issue description")
-        )
-
-        when(assetRepo.findById(1L)).thenReturn(Optional.of(asset))
-
-        the[IllegalArgumentException] thrownBy {
-          complaintService.createComplaintAdmin(dto)
-        } should have message "User ID is required"
-      }
 
       "throw EntityNotFoundException when user is not found" in {
         val asset = createSampleAsset(status = AssetStatus.AVAILABLE)
         val dto = ComplaintCreationDTO(
-          userId = Some("999"),
-          assetId = Some("1"),
-          description = Some("Issue description")
+          userId = "999",
+          assetId = "1",
+          description = "Issue description"
         )
 
         when(assetRepo.findById(1L)).thenReturn(Optional.of(asset))
@@ -407,9 +357,9 @@ class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar w
         val user = createSampleUser()
         val asset = createSampleAsset(status = AssetStatus.ASSIGNED)
         val dto = ComplaintCreationDTO(
-          userId = Some("1"),
-          assetId = Some("1"),
-          description = Some("Issue description")
+          userId = "1",
+          assetId = "1",
+          description = "Issue description"
         )
 
         when(assetRepo.findById(1L)).thenReturn(Optional.of(asset))
@@ -424,9 +374,9 @@ class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar w
         val user = createSampleUser()
         val asset = createSampleAsset(status = AssetStatus.MAINTENANCE)
         val dto = ComplaintCreationDTO(
-          userId = Some("1"),
-          assetId = Some("1"),
-          description = Some("Issue description")
+          userId = "1",
+          assetId = "1",
+          description = "Issue description"
         )
 
         when(assetRepo.findById(1L)).thenReturn(Optional.of(asset))
@@ -441,9 +391,9 @@ class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar w
         val user = createSampleUser()
         val asset = createSampleAsset(status = AssetStatus.RETIRED)
         val dto = ComplaintCreationDTO(
-          userId = Some("1"),
-          assetId = Some("1"),
-          description = Some("Issue description")
+          userId = "1",
+          assetId = "1",
+          description = "Issue description"
         )
 
         when(assetRepo.findById(1L)).thenReturn(Optional.of(asset))
@@ -458,9 +408,9 @@ class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar w
         val user = createSampleUser()
         val asset = createSampleAsset(status = AssetStatus.AVAILABLE)
         val dto = ComplaintCreationDTO(
-          userId = Some("1"),
-          assetId = Some("1"),
-          description = None
+          userId = "1",
+          assetId = "1",
+          description = ""
         )
 
         val savedComplaint = createSampleComplaint(
@@ -558,7 +508,7 @@ class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar w
 
       "change asset status to MAINTENANCE when first complaint is processed" in {
         val user = createSampleUser()
-        val asset = createSampleAsset( status = AssetStatus.ASSIGNED)
+        val asset = createSampleAsset(status = AssetStatus.ASSIGNED)
         val complaint = createSampleComplaint(
           user = user,
           asset = asset,
@@ -577,7 +527,7 @@ class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar w
 
       "not change asset status when multiple complaints are already in progress" in {
         val user = createSampleUser()
-        val asset = createSampleAsset( status = AssetStatus.MAINTENANCE)
+        val asset = createSampleAsset(status = AssetStatus.MAINTENANCE)
         val complaint = createSampleComplaint(
           user = user,
           asset = asset,
@@ -712,7 +662,7 @@ class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar w
         val user = createSampleUser()
         val asset = createSampleAsset()
         val complaints = java.util.Arrays.asList(
-          createSampleComplaint( user = user, asset = asset, status = ComplaintStatus.OPEN),
+          createSampleComplaint(user = user, asset = asset, status = ComplaintStatus.OPEN),
           createSampleComplaint(id = 2L, user = user, asset = asset, status = ComplaintStatus.OPEN)
         )
 
@@ -729,7 +679,7 @@ class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar w
         val user = createSampleUser()
         val asset = createSampleAsset()
         val complaints = java.util.Arrays.asList(
-          createSampleComplaint( user = user, asset = asset, status = ComplaintStatus.IN_PROGRESS)
+          createSampleComplaint(user = user, asset = asset, status = ComplaintStatus.IN_PROGRESS)
         )
 
         when(complaintRepo.findByStatus(ComplaintStatus.IN_PROGRESS)).thenReturn(complaints)
@@ -744,7 +694,7 @@ class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar w
         val user = createSampleUser()
         val asset = createSampleAsset()
         val complaints = java.util.Arrays.asList(
-          createSampleComplaint( user = user, asset = asset, status = ComplaintStatus.RESOLVED)
+          createSampleComplaint(user = user, asset = asset, status = ComplaintStatus.RESOLVED)
         )
 
         when(complaintRepo.findByStatus(ComplaintStatus.RESOLVED)).thenReturn(complaints)
@@ -759,7 +709,7 @@ class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar w
         val user = createSampleUser()
         val asset = createSampleAsset()
         val complaints = java.util.Arrays.asList(
-          createSampleComplaint( user = user, asset = asset, status = ComplaintStatus.WITHDRAWN)
+          createSampleComplaint(user = user, asset = asset, status = ComplaintStatus.WITHDRAWN)
         )
 
         when(complaintRepo.findByStatus(ComplaintStatus.WITHDRAWN)).thenReturn(complaints)
@@ -852,7 +802,7 @@ class ComplaintServiceTest extends AnyWordSpec with Matchers with MockitoSugar w
         val user = createSampleUser()
         val asset = createSampleAsset()
         val complaints = java.util.Arrays.asList(
-          createSampleComplaint( user = user, asset = asset, status = ComplaintStatus.OPEN),
+          createSampleComplaint(user = user, asset = asset, status = ComplaintStatus.OPEN),
           createSampleComplaint(id = 2L, user = user, asset = asset, status = ComplaintStatus.RESOLVED)
         )
 

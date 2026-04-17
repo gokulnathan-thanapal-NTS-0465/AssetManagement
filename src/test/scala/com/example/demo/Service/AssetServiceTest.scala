@@ -14,13 +14,14 @@ import org.scalatestplus.mockito.MockitoSugar
 
 import java.time.{LocalDate, LocalDateTime}
 import java.util.Optional
+import scala.compiletime.uninitialized
 
 class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with BeforeAndAfterEach {
 
-  var assetRepo: AssetRepository = _
-  var assetAssignmentRepo: AssetAssignmentRepository = _
+  var assetRepo: AssetRepository = uninitialized
+  var assetAssignmentRepo: AssetAssignmentRepository = uninitialized
 
-  var assetService: AssetService = _
+  var assetService: AssetService = uninitialized
 
   override def beforeEach(): Unit = {
     assetRepo = mock[AssetRepository]
@@ -83,13 +84,14 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
 
       "create asset successfully with valid data" in {
         val dto = AssetCreationDTO(
-          modelName = Some("MacBook Pro M3"),
-          category = Some(Category.LAPTOP)
+          modelName = "MacBook Pro M3",
+          category = Category.LAPTOP
         )
 
         val savedAsset = createSampleAsset(
           modelName = "MacBook Pro M3",
-          category = Category.LAPTOP
+          category = Category.LAPTOP,
+          status=AssetStatus.AVAILABLE
         )
 
         when(assetRepo.countByCategory(Category.LAPTOP)).thenReturn(0L)
@@ -103,46 +105,13 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
         verify(assetRepo).save(ArgumentMatchers.any[Asset])
       }
 
-      "throw IllegalArgumentException when modelName is missing" in {
-        val dto = AssetCreationDTO(
-          modelName = None,
-          category = Some(Category.LAPTOP)
-        )
-
-        the[IllegalArgumentException] thrownBy {
-          assetService.createAsset(dto)
-        } should have message "Model name required"
-      }
-
-      "throw IllegalArgumentException when category is missing" in {
-        val dto = AssetCreationDTO(
-          modelName = Some("Dell XPS 15"),
-          category = None
-        )
-
-        the[IllegalArgumentException] thrownBy {
-          assetService.createAsset(dto)
-        } should have message "Category required"
-      }
-
-      "throw IllegalArgumentException when both modelName and category are missing" in {
-        val dto = AssetCreationDTO(
-          modelName = None,
-          category = None
-        )
-
-        an[IllegalArgumentException] should be thrownBy {
-          assetService.createAsset(dto)
-        }
-      }
-
       "generate correct serial number for LAPTOP" in {
         val dto = AssetCreationDTO(
-          modelName = Some("Dell XPS"),
-          category = Some(Category.LAPTOP)
+          modelName = "Dell XPS",
+          category = Category.LAPTOP
         )
 
-        val savedAsset = createSampleAsset(serialNumber = "LAP-0001", category = Category.LAPTOP)
+        val savedAsset = createSampleAsset( category = Category.LAPTOP)
 
         when(assetRepo.countByCategory(Category.LAPTOP)).thenReturn(0L)
         when(assetRepo.save(ArgumentMatchers.any[Asset])).thenReturn(savedAsset)
@@ -154,8 +123,8 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
 
       "generate correct serial number for MOBILE" in {
         val dto = AssetCreationDTO(
-          modelName = Some("iPhone 15 Pro"),
-          category = Some(Category.MOBILE)
+          modelName = "iPhone 15 Pro",
+          category = Category.MOBILE
         )
 
         val savedAsset = createSampleAsset(
@@ -175,14 +144,13 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
 
       "generate correct serial number for DESKTOP" in {
         val dto = AssetCreationDTO(
-          modelName = Some("iMac 24"),
-          category = Some(Category.DESKTOP)
+          modelName = "iMac 24",
+          category = Category.DESKTOP
         )
 
         val savedAsset = createSampleAsset(
           serialNumber = "DES-0001",
           category = Category.DESKTOP,
-          credit = 75
         )
 
         when(assetRepo.countByCategory(Category.DESKTOP)).thenReturn(0L)
@@ -195,8 +163,8 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
 
       "generate correct serial number for KEYBOARD" in {
         val dto = AssetCreationDTO(
-          modelName = Some("Logitech MX Keys"),
-          category = Some(Category.KEYBOARD)
+          modelName = "Logitech MX Keys",
+          category = Category.KEYBOARD
         )
 
         val savedAsset = createSampleAsset(
@@ -215,8 +183,8 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
 
       "generate correct serial number for MOUSE" in {
         val dto = AssetCreationDTO(
-          modelName = Some("Logitech MX Master 3"),
-          category = Some(Category.MOUSE)
+          modelName = "Logitech MX Master 3",
+          category = Category.MOUSE
         )
 
         val savedAsset = createSampleAsset(
@@ -235,8 +203,8 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
 
       "generate incremented serial number when assets already exist" in {
         val dto = AssetCreationDTO(
-          modelName = Some("Dell XPS"),
-          category = Some(Category.LAPTOP)
+          modelName = "Dell XPS",
+          category = Category.LAPTOP
         )
 
         val savedAsset = createSampleAsset(serialNumber = "LAP-0006")
@@ -251,8 +219,8 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
 
       "set correct credit for LAPTOP category" in {
         val dto = AssetCreationDTO(
-          modelName = Some("Dell XPS"),
-          category = Some(Category.LAPTOP)
+          modelName = "Dell XPS",
+          category = Category.LAPTOP
         )
 
         val savedAsset = createSampleAsset(category = Category.LAPTOP, credit = 75)
@@ -267,8 +235,8 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
 
       "set correct credit for MOUSE category" in {
         val dto = AssetCreationDTO(
-          modelName = Some("Logitech Mouse"),
-          category = Some(Category.MOUSE)
+          modelName = "Logitech Mouse",
+          category = Category.MOUSE
         )
 
         val savedAsset = createSampleAsset(category = Category.MOUSE, credit = 15)
@@ -283,8 +251,8 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
 
       "set status as AVAILABLE for new asset" in {
         val dto = AssetCreationDTO(
-          modelName = Some("Dell XPS"),
-          category = Some(Category.LAPTOP)
+          modelName = "Dell XPS",
+          category = Category.LAPTOP
         )
 
         val savedAsset = createSampleAsset(status = AssetStatus.AVAILABLE)
@@ -425,7 +393,7 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
       "update model name successfully" in {
         val existingAsset = createSampleAsset(modelName = "Old Model")
         val updatedAsset = createSampleAsset(modelName = "New Model")
-        val dto = AssetUpdateDTO(modelName = Some("New Model"))
+        val dto = AssetUpdateDTO(modelName = "New Model")
 
         when(assetRepo.findById(1L)).thenReturn(Optional.of(existingAsset))
         when(assetRepo.save(ArgumentMatchers.any[Asset])).thenReturn(updatedAsset)
@@ -437,7 +405,7 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
       }
 
       "throw EntityNotFoundException when asset not found" in {
-        val dto = AssetUpdateDTO(modelName = Some("New Model"))
+        val dto = AssetUpdateDTO(modelName = "New Model")
 
         when(assetRepo.findById(999L)).thenReturn(Optional.empty())
 
@@ -448,7 +416,7 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
 
       "throw IllegalArgumentException when modelName is not provided" in {
         val existingAsset = createSampleAsset()
-        val dto = AssetUpdateDTO(modelName = None)
+        val dto = AssetUpdateDTO(modelName =null)
 
         when(assetRepo.findById(1L)).thenReturn(Optional.of(existingAsset))
 
@@ -463,7 +431,7 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
           status = AssetStatus.AVAILABLE,
           category = Category.LAPTOP,
         )
-        val dto = AssetUpdateDTO(modelName = Some("New Model"))
+        val dto = AssetUpdateDTO(modelName = "New Model")
 
         when(assetRepo.findById(1L)).thenReturn(Optional.of(existingAsset))
         when(assetRepo.save(ArgumentMatchers.any[Asset])).thenReturn(existingAsset)
@@ -633,7 +601,7 @@ class AssetServiceTest extends AnyWordSpec with Matchers with MockitoSugar with 
 
       "return all assets when no filters" in {
         val assets = java.util.Arrays.asList(
-          createSampleAsset(id = 1L),
+          createSampleAsset(),
           createSampleAsset(id = 2L),
           createSampleAsset(id = 3L)
         )

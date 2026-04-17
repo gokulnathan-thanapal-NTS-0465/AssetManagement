@@ -6,9 +6,11 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.BeforeAndAfterEach
 import org.springframework.test.util.ReflectionTestUtils
 
+import scala.compiletime.uninitialized
+
 class JwtUtilTest extends AnyWordSpec with Matchers with BeforeAndAfterEach {
 
-  var jwtUtil: JwtUtil = _
+  var jwtUtil: JwtUtil = uninitialized
 
   override def beforeEach(): Unit = {
     jwtUtil = new JwtUtil()

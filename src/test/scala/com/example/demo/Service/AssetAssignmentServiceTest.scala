@@ -14,14 +14,15 @@ import org.scalatestplus.mockito.MockitoSugar
 
 import java.time.{LocalDate, LocalDateTime}
 import java.util.Optional
+import scala.compiletime.uninitialized
 
 class AssetAssignmentServiceTest extends AnyWordSpec with Matchers with MockitoSugar with BeforeAndAfterEach {
 
-  var assetAssignmentRepo: AssetAssignmentRepository = _
-  var assetRepo: AssetRepository = _
-  var userRepo: UserRepository = _
+  var assetAssignmentRepo: AssetAssignmentRepository = uninitialized
+  var assetRepo: AssetRepository = uninitialized
+  var userRepo: UserRepository = uninitialized
 
-  var assetAssignmentService: AssetAssignmentService = _
+  var assetAssignmentService: AssetAssignmentService = uninitialized
 
   override def beforeEach(): Unit = {
     assetAssignmentRepo = mock[AssetAssignmentRepository]

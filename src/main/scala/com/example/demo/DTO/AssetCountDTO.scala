@@ -1,10 +1,12 @@
 package com.example.demo.DTO
 
+import scala.compiletime.uninitialized
+
 class AssetCountDTO {
-  var laptop: Long = _
-  var desktop: Long = _
-  var mouse: Long = _
-  var keyboard: Long = _
-  var mobile: Long = _
-  var total: Long = _
+  var laptop: Long = uninitialized
+  var desktop: Long = uninitialized
+  var mouse: Long = uninitialized
+  var keyboard: Long = uninitialized
+  var mobile: Long = uninitialized
+  var total: Long = uninitialized
 }

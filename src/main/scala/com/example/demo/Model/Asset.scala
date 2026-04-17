@@ -5,6 +5,7 @@ import jakarta.annotation.Nullable
 import jakarta.persistence.{Column, Entity, EnumType, Enumerated, GeneratedValue, GenerationType, Id, Table}
 
 import scala.beans.BeanProperty
+import scala.compiletime.uninitialized
 
 @Entity
 @Table(name = "Assets")
@@ -13,30 +14,30 @@ class Asset {
   @GeneratedValue(strategy=GenerationType.IDENTITY)
   @Column(nullable = false)
   @BeanProperty
-  var id: Long = _
+  var id: Long = uninitialized
 
   @Column(name = "serial_number", nullable = false)
   @BeanProperty
-  var serialNumber: String = _
+  var serialNumber: String = uninitialized
 
   @Column(name = "model_name", nullable = false)
   @BeanProperty
-  var modelName: String = _
+  var modelName: String = uninitialized
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   @BeanProperty
-  var status: AssetStatus = _
+  var status: AssetStatus = uninitialized
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   @BeanProperty
-  var category: Category = _
+  var category: Category = uninitialized
 
 
   @Column(nullable = false)
   @BeanProperty
-  var credit:Int = _
+  var credit:Int = uninitialized
 
 }
 

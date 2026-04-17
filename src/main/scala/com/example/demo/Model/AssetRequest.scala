@@ -4,6 +4,7 @@ import com.example.demo.Model.Enums.{Category, RequestStatus}
 import jakarta.persistence.{Column, Entity, EnumType, Enumerated, ForeignKey, GeneratedValue, GenerationType, Id, JoinColumn, ManyToOne, Table}
 
 import scala.beans.BeanProperty
+import scala.compiletime.uninitialized
 
 @Entity
 @Table(name = "AssetRequests")
@@ -13,26 +14,26 @@ class AssetRequest {
   @GeneratedValue(strategy=GenerationType.IDENTITY)
   @Column(nullable = false)
   @BeanProperty
-  var id: Long = _
+  var id: Long = uninitialized
 
   @ManyToOne
   @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, foreignKey = new ForeignKey(name = "fk_request_user_id"))
   @BeanProperty
-  var user: User = _
+  var user: User = uninitialized
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   @BeanProperty
-  var category: Category = _
+  var category: Category = uninitialized
 
   @Column(nullable = false)
   @BeanProperty
-  var reason: String = _
+  var reason: String = uninitialized
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   @BeanProperty
-  var status: RequestStatus = _
+  var status: RequestStatus = uninitialized
 
 
 }
