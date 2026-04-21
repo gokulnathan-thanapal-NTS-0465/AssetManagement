@@ -64,7 +64,6 @@ class AssetService(assetRepo: AssetRepository, assetAssignmentRepo: AssetAssignm
   @Transactional
   def updateAssetById(assetId: Long, assetUpdateDTO: AssetUpdateDTO): AssetResponseDTO = {
     var asset = assetRepo.findById(assetId).orElseThrow(() => new EntityNotFoundException("Asset not found "))
-    println("Model name :: "+assetUpdateDTO.modelName)
     AssetMapper.updateEntity(assetUpdateDTO, asset)
     asset = assetRepo.save(asset)
     val assetResponseDTO = AssetMapper.toResponse(asset)

@@ -15,13 +15,11 @@ object AssetMapper {
 
 
   def updateEntity(dto: AssetUpdateDTO, asset: Asset): Asset = {
-    println("Model name :: "+dto.modelName)
     if(dto.modelName !=null ){
       asset.modelName = dto.modelName
       asset
     }
     else {
-      println("Model name is empty or null")
       throw new IllegalArgumentException("Model name required")
     }
 
